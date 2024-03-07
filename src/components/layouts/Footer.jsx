@@ -28,17 +28,18 @@ const Footer = () => {
             <ul className="nav flex-column">
               <li className="nav-item mb-2">
                 <Link to="#" className="nav-link p-0 text-muted">
-                  <i class="bi bi-envelope-fill"></i> threetiger@gmail.com
+                  <i className="bi bi-envelope-fill"></i> threetiger@gmail.com
                 </Link>
               </li>
               <li className="nav-item mb-2">
                 <Link to="#" className="nav-link p-0 text-muted">
-                  <i class="bi bi-telephone-fill"></i> +84 123 456 789
+                  <i className="bi bi-telephone-fill"></i> +84 123 456 789
                 </Link>
               </li>
               <li className="nav-item mb-2">
                 <Link to="#" className="nav-link p-0 text-muted">
-                  <i class="bi bi-geo-alt-fill"></i> Ninh Kieu, Can Tho, Vietnam
+                  <i className="bi bi-geo-alt-fill"></i> Ninh Kieu, Can Tho,
+                  Vietnam
                 </Link>
               </li>
             </ul>
@@ -99,21 +100,21 @@ const Footer = () => {
               <li className="nav-item me-2">
                 <Link to="#" className="nav-link p-0 text-muted">
                   <Button variant="light">
-                    <i class="bi bi-facebook"></i>
+                    <i className="bi bi-facebook"></i>
                   </Button>
                 </Link>
               </li>
               <li className="nav-item me-2">
                 <Link to="#" className="nav-link p-0 text-muted">
                   <Button variant="light">
-                    <i class="bi bi-google"></i>
+                    <i className="bi bi-google"></i>
                   </Button>
                 </Link>
               </li>
               <li className="nav-item me-2">
                 <Link to="#" className="nav-link p-0 text-muted">
                   <Button variant="light">
-                    <i class="bi bi-linkedin"></i>
+                    <i className="bi bi-linkedin"></i>
                   </Button>
                 </Link>
               </li>

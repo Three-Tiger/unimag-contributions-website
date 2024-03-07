@@ -25,3 +25,7 @@
   -webkit-box-orient: vertical;
   -moz-box-orient: vertical;
 }
+
+.invalid-feedback {
+  display: block !important;
+}

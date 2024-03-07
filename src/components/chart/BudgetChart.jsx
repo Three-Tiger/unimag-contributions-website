@@ -62,7 +62,11 @@ const BudgetChart = () => {
   }, []); // Empty dependency array to ensure useEffect runs only once
 
   return (
-    <div id="budgetChart" style={{ minHeight: "400px" }} class="echart"></div>
+    <div
+      id="budgetChart"
+      style={{ minHeight: "400px" }}
+      className="echart"
+    ></div>
   );
 };
 

@@ -55,7 +55,6 @@ a:hover {
   font-size: 24px;
   margin-bottom: 0;
   font-weight: 600;
-  color: #012970;
 }
 
 /*--------------------------------------------------------------
@@ -68,7 +67,7 @@ a:hover {
   right: 15px;
   bottom: 15px;
   z-index: 99999;
-  background: #4154f1;
+  background: #ffca2c;
   width: 40px;
   height: 40px;
   border-radius: 4px;
@@ -244,8 +243,6 @@ a:hover {
   padding: 20px 0 15px 0;
   font-size: 18px;
   font-weight: 500;
-  color: #012970;
-  font-family: "Poppins", sans-serif;
 }
 
 .card-title span {
@@ -265,7 +262,6 @@ a:hover {
 /* Alerts */
 .alert-heading {
   font-weight: 500;
-  font-family: "Poppins", sans-serif;
   font-size: 20px;
 }
 
@@ -290,7 +286,7 @@ a:hover {
 }
 
 .accordion-button:not(.collapsed) {
-  color: #012970;
+  color: #ffca2c;
   background-color: #f6f9ff;
 }
 
@@ -302,7 +298,7 @@ a:hover {
 
 .accordion-flush .accordion-button:not(.collapsed) {
   box-shadow: none;
-  color: #4154f1;
+  color: #ffca2c;
 }
 
 .accordion-flush .accordion-body {
@@ -314,7 +310,6 @@ a:hover {
 /* Breadcrumbs */
 .breadcrumb {
   font-size: 14px;
-  font-family: "Nunito", sans-serif;
   color: #899bbd;
   font-weight: 600;
 }
@@ -350,13 +345,13 @@ a:hover {
 
 .nav-tabs-bordered .nav-link:hover,
 .nav-tabs-bordered .nav-link:focus {
-  color: #4154f1;
+  color: #ffca2c;
 }
 
 .nav-tabs-bordered .nav-link.active {
   background-color: #fff;
-  color: #4154f1;
-  border-bottom: 2px solid #4154f1;
+  color: #ffca2c;
+  border-bottom: 2px solid #ffca2c;
 }
 
 /*--------------------------------------------------------------
@@ -380,8 +375,7 @@ a:hover {
 .logo span {
   font-size: 26px;
   font-weight: 700;
-  color: #012970;
-  font-family: "Nunito", sans-serif;
+  color: #ffca2c;
 }
 
 .header {
@@ -399,7 +393,7 @@ a:hover {
   font-size: 32px;
   padding-left: 10px;
   cursor: pointer;
-  color: #012970;
+  color: #ffca2c;
 }
 
 .header .search-bar {
@@ -436,7 +430,7 @@ a:hover {
 .header .search-form input {
   border: 0;
   font-size: 14px;
-  color: #012970;
+  color: #ffca2c;
   border: 1px solid rgba(1, 41, 112, 0.2);
   padding: 7px 38px 7px 8px;
   border-radius: 3px;
@@ -459,7 +453,7 @@ a:hover {
 }
 
 .header .search-form button i {
-  color: #012970;
+  color: #ffca2c;
 }
 
 /*--------------------------------------------------------------
@@ -476,13 +470,8 @@ a:hover {
 
 .header-nav .nav-icon {
   font-size: 22px;
-  color: #012970;
   margin-right: 25px;
   position: relative;
-}
-
-.header-nav .nav-profile {
-  color: #012970;
 }
 
 .header-nav .nav-profile img {
@@ -690,7 +679,6 @@ a:hover {
   align-items: center;
   font-size: 15px;
   font-weight: 600;
-  color: #4154f1;
   transition: 0.3;
   background: #f6f9ff;
   padding: 10px 15px;
@@ -700,11 +688,9 @@ a:hover {
 .sidebar-nav .nav-link i {
   font-size: 16px;
   margin-right: 10px;
-  color: #4154f1;
 }
 
 .sidebar-nav .nav-link.collapsed {
-  color: #012970;
   background: #fff;
 }
 
@@ -713,12 +699,12 @@ a:hover {
 }
 
 .sidebar-nav .nav-link:hover {
-  color: #4154f1;
+  color: #ffca2c;
   background: #f6f9ff;
 }
 
 .sidebar-nav .nav-link:hover i {
-  color: #4154f1;
+  color: #ffca2c;
 }
 
 .sidebar-nav .nav-link .bi-chevron-down {
@@ -741,7 +727,7 @@ a:hover {
   align-items: center;
   font-size: 14px;
   font-weight: 600;
-  color: #012970;
+  color: #ffca2c;
   transition: 0.3;
   padding: 10px 0 10px 40px;
   transition: 0.3s;
@@ -756,11 +742,11 @@ a:hover {
 
 .sidebar-nav .nav-content a:hover,
 .sidebar-nav .nav-content a.active {
-  color: #4154f1;
+  color: #ffca2c;
 }
 
 .sidebar-nav .nav-content a.active i {
-  background-color: #4154f1;
+  background-color: #ffca2c;
 }
 
 /*--------------------------------------------------------------
@@ -783,7 +769,7 @@ a:hover {
 
 .dashboard .filter .icon:hover,
 .dashboard .filter .icon:focus {
-  color: #4154f1;
+  color: #ffca2c;
 }
 
 .dashboard .filter .dropdown-header {
@@ -811,7 +797,6 @@ a:hover {
 
 .dashboard .info-card h6 {
   font-size: 28px;
-  color: #012970;
   font-weight: 700;
   margin: 0;
   padding: 0;
@@ -827,7 +812,7 @@ a:hover {
 }
 
 .dashboard .sales-card .card-icon {
-  color: #4154f1;
+  color: #ffca2c;
   background: #f6f6fe;
 }
 
@@ -907,12 +892,12 @@ a:hover {
 }
 
 .dashboard .news h4 a {
-  color: #012970;
+  color: #ffca2c;
   transition: 0.3s;
 }
 
 .dashboard .news h4 a:hover {
-  color: #4154f1;
+  color: #ffca2c;
 }
 
 .dashboard .news p {
@@ -979,7 +964,7 @@ a:hover {
   background-color: #fff;
   border-radius: 0.25rem;
   text-align: center;
-  color: #012970;
+  color: #ffca2c;
   padding: 15px 0;
 }
 
@@ -989,7 +974,6 @@ a:hover {
 }
 
 .iconslist .label {
-  font-family: var(--bs-font-monospace);
   display: inline-block;
   width: 100%;
   overflow: hidden;
@@ -1028,16 +1012,12 @@ a:hover {
 }
 
 .profile .profile-card .social-links a:hover {
-  color: #012970;
+  color: #ffca2c;
 }
 
 .profile .profile-overview .row {
   margin-bottom: 20px;
   font-size: 15px;
-}
-
-.profile .profile-overview .card-title {
-  color: #012970;
 }
 
 .profile .profile-overview .label {
@@ -1060,7 +1040,7 @@ a:hover {
 .faq .basic h6 {
   font-size: 18px;
   font-weight: 600;
-  color: #4154f1;
+  color: #ffca2c;
 }
 
 .faq .basic p {
@@ -1077,12 +1057,12 @@ a:hover {
 .contact .info-box i {
   font-size: 38px;
   line-height: 0;
-  color: #4154f1;
+  color: #ffca2c;
 }
 
 .contact .info-box h3 {
   font-size: 20px;
-  color: #012970;
+  color: #ffca2c;
   font-weight: 700;
   margin: 20px 0 10px 0;
 }
@@ -1145,7 +1125,7 @@ a:hover {
 
 .contact .php-email-form input:focus,
 .contact .php-email-form textarea:focus {
-  border-color: #4154f1;
+  border-color: #ffca2c;
 }
 
 .contact .php-email-form input {
@@ -1157,7 +1137,7 @@ a:hover {
 }
 
 .contact .php-email-form button[type="submit"] {
-  background: #4154f1;
+  background: #ffca2c;
   border: 0;
   padding: 10px 30px;
   color: #fff;
@@ -1199,7 +1179,7 @@ a:hover {
 .error-404 h1 {
   font-size: 180px;
   font-weight: 700;
-  color: #4154f1;
+  color: #ffca2c;
   margin-bottom: 0;
   line-height: 150px;
 }
@@ -1207,7 +1187,7 @@ a:hover {
 .error-404 h2 {
   font-size: 24px;
   font-weight: 700;
-  color: #012970;
+  color: #ffca2c;
   margin-bottom: 30px;
 }
 
@@ -1239,12 +1219,12 @@ a:hover {
 
 .footer .copyright {
   text-align: center;
-  color: #012970;
+  color: #ffca2c;
 }
 
 .footer .credits {
   padding-top: 5px;
   text-align: center;
   font-size: 13px;
-  color: #012970;
+  color: #ffca2c;
 }

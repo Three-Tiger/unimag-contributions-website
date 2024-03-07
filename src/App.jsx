@@ -136,7 +136,7 @@ function App() {
         {/* Video */}
         <section className="py-5">
           <Container>
-            <div class="video-container">
+            <div className="video-container">
               <video
                 src="video/introduction.mp4"
                 controls
