@@ -80,7 +80,7 @@ function App() {
       author: "Bob Williams",
       title: "Space Exploration: Past, Present, and Future",
       description:
-        "A comprehensive overview of humanity's journey into space and what lies ahead.",
+        "A comprehensive overview of humanity's journey into space and what lies ahead. Examining the economic consequences of climate change and possible solutions.",
     },
     {
       id: 5,
