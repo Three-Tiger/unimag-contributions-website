@@ -61,7 +61,7 @@ const FacultyPage = () => {
           return previousState.filter((faculty) => faculty.facultyId !== id);
         });
       } catch (error) {
-        console.log("Failed to remove faculty: ", error);
+        handleErrors(error);
       }
     });
   };
@@ -97,8 +97,9 @@ const FacultyPage = () => {
               return faculty;
             });
           });
+          handleClose();
         } catch (error) {
-          console.log("Failed to update faculty: ", error);
+          handleErrors(error);
         }
       } else {
         try {
@@ -106,12 +107,11 @@ const FacultyPage = () => {
           setFaculties((previousState) => {
             return [...previousState, response];
           });
+          handleClose();
         } catch (error) {
-          console.log("Failed to add new faculty: ", error);
+          handleErrors(error);
         }
       }
-
-      handleClose();
     } catch (error) {
       const newError = {};
       error.inner.forEach((e) => {
@@ -121,13 +121,29 @@ const FacultyPage = () => {
     }
   };
 
+  const handleErrors = (error) => {
+    if (error.response.status >= 400 && error.response.status < 500) {
+      swalService.showMessage(
+        "Warning",
+        error.response.data.message,
+        "warning"
+      );
+    } else {
+      swalService.showMessage(
+        "Error",
+        "Something went wrong. Please try again later.",
+        "error"
+      );
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await facultyApi.getAll();
         setFaculties(response);
       } catch (error) {
-        console.log("Failed to fetch faculties: ", error);
+        handleErrors(error);
       }
     };
 

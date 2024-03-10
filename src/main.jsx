@@ -9,8 +9,8 @@ import "./index.css";
 import LoginPage from "./pages/LoginPage.jsx";
 import FacultyPage from "./pages/FacultyPage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
-import ContributionPage from "./pages/ContributionPage.jsx";
 import AnnualMagazinePage from "./pages/AnnualMagazine.jsx";
+import ContributionPage2 from "./pages/ContributionPage2.jsx";
 
 const router = createBrowserRouter([
   {
@@ -35,7 +35,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/contribution",
-    element: <ContributionPage />,
+    element: <ContributionPage2 />,
   },
 ]);
 
