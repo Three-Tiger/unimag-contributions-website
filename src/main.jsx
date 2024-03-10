@@ -9,6 +9,10 @@ import "./index.css";
 import LoginPage from "./pages/LoginPage.jsx";
 import FacultyPage from "./pages/FacultyPage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
+import RegisterPage from "./pages/RegisterPage.jsx";
+import AllFacultyPage from "./pages/AllFaculty.jsx";
+import SubmitionPage from "./pages/SubmitionPage.jsx";
+import ContributionPage from "./pages/ContributionPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -20,12 +24,28 @@ const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
+    path: "/register",
+    element: <RegisterPage />,
+  },
+  {
     path: "/dashboard",
     element: <DashboardPage />,
   },
   {
     path: "/faculty",
     element: <FacultyPage />,
+  },
+  {
+    path: "/allFaculty",
+    element: <AllFacultyPage />,
+  },
+  {
+    path: "/submition",
+    element: <SubmitionPage />,
+  },
+  {
+    path: "/contribution",
+    element: <ContributionPage />,
   },
 ]);
 

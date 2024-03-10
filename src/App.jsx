@@ -106,7 +106,7 @@ function App() {
     <>
       <FullLayout>
         {/* Hero Section */}
-        <section className="py-5">
+        <section className="">
           <div className="px-4 py-5 my-5 text-center">
             <div className="d-flex justify-content-center align-items-center gap-3 mb-4 mt-5">
               <img src={Lightning} alt="Lightning" />
@@ -151,7 +151,7 @@ function App() {
           <Container>
             <div className="d-flex justify-content-between align-items-center mb-5">
               <h2 className="fw-bold mb-0">Faculty</h2>
-              <Link to="/faculty">
+              <Link to="/allFaculty">
                 <Button variant="outline-warning">View All</Button>
               </Link>
             </div>
@@ -170,9 +170,11 @@ function App() {
                         <p className="description">{course.description}</p>
                       </Card.Text>
                       <div className="text-end">
-                        <Button variant="outline-warning">
-                          <i className="bi bi-arrow-up-right"></i>
-                        </Button>
+                        <Link to="/submition">
+                          <Button variant="outline-warning">
+                            <i className="bi bi-arrow-up-right"></i>
+                          </Button>
+                        </Link>
                       </div>
                     </Card.Body>
                   </Card>
@@ -200,6 +202,7 @@ function App() {
                 </Link>
               </Col>
             </Row>
+
             <Row>
               {studentArticles.map((article) => (
                 <Col md={6}>

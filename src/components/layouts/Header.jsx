@@ -42,11 +42,21 @@ const Header = () => {
                   <Nav.Link href="#action4">Contact</Nav.Link>
                 </Nav>
                 <div className="text-center">
-                  <Button variant="outline-warning" className="me-2">
-                    Sign Up
-                  </Button>
+                  <Link to="/register">
+                    <Button variant="outline-warning" className="me-2">
+                      Sign Up
+                    </Button>
+                  </Link>
                   <Link to="/login">
-                    <Button variant="warning">Login</Button>
+                    <Button variant="warning" className="me-4">
+                      Login
+                    </Button>
+                  </Link>
+
+                  <Link to="/contribution">
+                    <Button variant="outline-warning" className="me-2">
+                      Contribution
+                    </Button>
                   </Link>
                 </div>
               </Offcanvas.Body>
