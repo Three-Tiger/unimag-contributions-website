@@ -9,6 +9,8 @@ import "./index.css";
 import LoginPage from "./pages/LoginPage.jsx";
 import FacultyPage from "./pages/FacultyPage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
+import ContributionPage from "./pages/ContributionPage.jsx";
+import AnnualMagazinePage from "./pages/AnnualMagazine.jsx";
 
 const router = createBrowserRouter([
   {
@@ -27,10 +29,19 @@ const router = createBrowserRouter([
     path: "/faculty",
     element: <FacultyPage />,
   },
+  {
+    path: "/annual-magazine",
+    element: <AnnualMagazinePage />,
+  },
+  {
+    path: "/contribution",
+    element: <ContributionPage />,
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>
+  // <React.StrictMode>
+  //   <RouterProvider router={router} />
+  // </React.StrictMode>
+  <RouterProvider router={router} />
 );

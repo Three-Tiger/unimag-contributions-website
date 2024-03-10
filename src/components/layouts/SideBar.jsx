@@ -19,17 +19,17 @@ const SideBar = () => {
         </li>
 
         <li className="nav-item">
-          <a className="nav-link collapsed" href="pages-faq.html">
+          <Link className="nav-link collapsed" to="/annual-magazine">
             <i className="bi bi-calendar"></i>
             <span>Annual Magazine</span>
-          </a>
+          </Link>
         </li>
 
         <li className="nav-item">
-          <a className="nav-link collapsed" href="pages-register.html">
+          <Link className="nav-link collapsed" to="/contribution">
             <i className="bi bi-book"></i>
             <span>Contribution</span>
-          </a>
+          </Link>
         </li>
 
         <li className="nav-item">

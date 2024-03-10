@@ -1,19 +1,28 @@
 import { Button, Modal, Table } from "react-bootstrap";
 import AdminLayout from "../components/layouts/Admin";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Form } from "react-router-dom";
 import * as yup from "yup";
-import Swal from "sweetalert2";
+import facultyApi from "../api/facultyApi";
+import swalService from "../services/SwalService";
 
-function FacultyPage() {
-  // Modal
+const FacultyPage = () => {
+  const row = ["#", "Name", "Description", "Action"];
+  const [faculties, setFaculties] = useState([]);
   const [modelTitle, setModelTitle] = useState("Add new Faculty");
   const [show, setShow] = useState(false);
+  const [formData, setFormData] = useState({
+    facultyId: "",
+    name: "",
+    description: "",
+  });
+  const [error, setError] = useState({});
 
   const handleClose = () => {
     setShow(false);
     setError({});
     setFormData({
+      facultyId: "",
       name: "",
       description: "",
     });
@@ -26,11 +35,17 @@ function FacultyPage() {
 
   // Edit
   const showEdit = (id) => {
-    const faculty = faculties.find((faculty) => faculty.id === id);
+    const faculty = faculties.find((faculty) => {
+      return faculty.facultyId === id;
+    });
 
-    setFormData({
-      name: faculty.name,
-      description: faculty.description,
+    setFormData((previousState) => {
+      return {
+        ...previousState,
+        facultyId: faculty.facultyId,
+        name: faculty.name,
+        description: faculty.description,
+      };
     });
 
     setShow(true);
@@ -39,30 +54,17 @@ function FacultyPage() {
 
   // Remove
   const handleRemove = (id) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You will not be able to recover this faculty!",
-      icon: "warning",
-      confirmButtonColor: "#dc3545",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "No, keep it",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        console.log(id);
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
+    swalService.confirmDelete(() => {
+      try {
+        facultyApi.Remove(id);
+        setFaculties((previousState) => {
+          return previousState.filter((faculty) => faculty.facultyId !== id);
+        });
+      } catch (error) {
+        console.log("Failed to remove faculty: ", error);
       }
     });
   };
-
-  // Form Data
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-  });
-
-  // Error
-  const [error, setError] = useState({});
 
   // Yup validation
   const schema = yup.object().shape({
@@ -84,7 +86,30 @@ function FacultyPage() {
     try {
       await schema.validate(formData, { abortEarly: false });
 
-      console.log(formData);
+      if (formData.facultyId) {
+        try {
+          const response = await facultyApi.Update(formData);
+          setFaculties((previousState) => {
+            return previousState.map((faculty) => {
+              if (faculty.facultyId === formData.facultyId) {
+                return response;
+              }
+              return faculty;
+            });
+          });
+        } catch (error) {
+          console.log("Failed to update faculty: ", error);
+        }
+      } else {
+        try {
+          const response = await facultyApi.AddNew(formData);
+          setFaculties((previousState) => {
+            return [...previousState, response];
+          });
+        } catch (error) {
+          console.log("Failed to add new faculty: ", error);
+        }
+      }
 
       handleClose();
     } catch (error) {
@@ -96,46 +121,18 @@ function FacultyPage() {
     }
   };
 
-  const row = ["#", "Name", "Description", "Action"];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await facultyApi.getAll();
+        setFaculties(response);
+      } catch (error) {
+        console.log("Failed to fetch faculties: ", error);
+      }
+    };
 
-  const faculties = [
-    {
-      id: "a1",
-      name: "Information Technology",
-      description:
-        "Some quick example text to build on the card title and make up the bulk of the card's content.",
-    },
-    {
-      id: "a2",
-      name: "Computer Science",
-      description:
-        "Some quick example text to build on the card title and make up the bulk of the card's content.",
-    },
-    {
-      id: "a3",
-      name: "Artificial intelligence",
-      description:
-        "Some quick example text to build on the card title and make up the bulk of the card's content.",
-    },
-    {
-      id: "a4",
-      name: "Business administration",
-      description:
-        "Some quick example text to build on the card title and make up the bulk of the card's content.",
-    },
-    {
-      id: "a5",
-      name: "Event management",
-      description:
-        "Some quick example text to build on the card title and make up the bulk of the card's content.",
-    },
-    {
-      id: "a6",
-      name: "Graphic design",
-      description:
-        "Some quick example text to build on the card title and make up the bulk of the card's content.",
-    },
-  ];
+    fetchData();
+  }, []);
 
   return (
     <>
@@ -208,7 +205,7 @@ function FacultyPage() {
                     Close
                   </Button>
                   <Button variant="primary" type="submit">
-                    Add
+                    Submit
                   </Button>
                 </Modal.Footer>
               </form>
@@ -232,13 +229,13 @@ function FacultyPage() {
                 <td className="d-flex flex-wrap gap-2">
                   <Button
                     variant="outline-warning"
-                    onClick={() => showEdit(faculty.id)}
+                    onClick={() => showEdit(faculty.facultyId)}
                   >
                     Edit
                   </Button>
                   <Button
                     variant="danger"
-                    onClick={() => handleRemove(faculty.id)}
+                    onClick={() => handleRemove(faculty.facultyId)}
                   >
                     Delete
                   </Button>
@@ -250,6 +247,6 @@ function FacultyPage() {
       </AdminLayout>
     </>
   );
-}
+};
 
 export default FacultyPage;

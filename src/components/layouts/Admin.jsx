@@ -17,7 +17,7 @@ const AdminLayout = ({ children }) => {
       >
         <div className="d-flex align-items-center justify-content-between">
           <a href="index.html" className="logo d-flex align-items-center">
-            <img src="assets/img/logo.png" alt="" />
+            <img src="/image/logo.png" alt="" />
             <span className="d-none d-lg-block">Unimag</span>
           </a>
           <i
@@ -213,8 +213,10 @@ const AdminLayout = ({ children }) => {
                 data-bs-toggle="dropdown"
               >
                 <img
-                  src="assets/img/profile-img.jpg"
+                  src="/image/default-avatar.png"
                   alt="Profile"
+                  width={30}
+                  height={30}
                   className="rounded-circle"
                 />
                 <span className="d-none d-md-block dropdown-toggle ps-2">
