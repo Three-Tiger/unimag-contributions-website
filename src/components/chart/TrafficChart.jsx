@@ -65,7 +65,11 @@ const TrafficChart = () => {
   }, []); // Empty dependency array to ensure useEffect runs only once
 
   return (
-    <div id="trafficChart" style={{ minHeight: "400px" }} class="echart"></div>
+    <div
+      id="trafficChart"
+      style={{ minHeight: "400px" }}
+      className="echart"
+    ></div>
   );
 };
 

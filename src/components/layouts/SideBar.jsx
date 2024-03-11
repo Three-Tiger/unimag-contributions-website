@@ -2,46 +2,46 @@ import { Link } from "react-router-dom";
 
 const SideBar = () => {
   return (
-    <aside id="sidebar" class="sidebar">
-      <ul class="sidebar-nav" id="sidebar-nav">
-        <li class="nav-item">
-          <a class="nav-link " href="index.html">
-            <i class="bi bi-grid"></i>
+    <aside id="sidebar" className="sidebar">
+      <ul className="sidebar-nav" id="sidebar-nav">
+        <li className="nav-item">
+          <Link className="nav-link " to="/admin/dashboard">
+            <i className="bi bi-grid"></i>
             <span>Dashboard</span>
-          </a>
+          </Link>
         </li>
 
-        <li class="nav-item">
-          <Link class="nav-link collapsed" to="users-profile.html">
-            <i class="bi bi-person-workspace"></i>
+        <li className="nav-item">
+          <Link className="nav-link collapsed" to="/admin/faculty">
+            <i className="bi bi-person-workspace"></i>
             <span>Faculty</span>
           </Link>
         </li>
 
-        <li class="nav-item">
-          <a class="nav-link collapsed" href="pages-faq.html">
-            <i class="bi bi-calendar"></i>
+        <li className="nav-item">
+          <Link className="nav-link collapsed" to="/admin/annual-magazine">
+            <i className="bi bi-calendar"></i>
             <span>Annual Magazine</span>
-          </a>
+          </Link>
         </li>
 
-        <li class="nav-item">
-          <a class="nav-link collapsed" href="pages-register.html">
-            <i class="bi bi-book"></i>
+        <li className="nav-item">
+          <Link className="nav-link collapsed" to="/admin/contribution">
+            <i className="bi bi-book"></i>
             <span>Contribution</span>
-          </a>
+          </Link>
         </li>
 
-        <li class="nav-item">
-          <a class="nav-link collapsed" href="pages-contact.html">
-            <i class="bi bi-person"></i>
+        <li className="nav-item">
+          <a className="nav-link collapsed" href="pages-contact.html">
+            <i className="bi bi-person"></i>
             <span>User</span>
           </a>
         </li>
 
-        <li class="nav-item">
-          <a class="nav-link collapsed" href="pages-register.html">
-            <i class="bi bi-box-arrow-right"></i>
+        <li className="nav-item">
+          <a className="nav-link collapsed" href="pages-register.html">
+            <i className="bi bi-box-arrow-right"></i>
             <span>Logout</span>
           </a>
         </li>

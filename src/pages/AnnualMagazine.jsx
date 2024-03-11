@@ -3,18 +3,30 @@ import AdminLayout from "../components/layouts/Admin";
 import { useEffect, useState } from "react";
 import { Form } from "react-router-dom";
 import * as yup from "yup";
-import facultyApi from "../api/facultyApi";
 import swalService from "../services/SwalService";
+import annualMagazineApi from "../api/annualMagazine";
+import formatDateTime from "../services/FormatDateTime";
 
-const FacultyPage = () => {
-  const row = ["#", "Name", "Description", "Action"];
-  const [faculties, setFaculties] = useState([]);
+const AnnualMagazinePage = () => {
+  const row = [
+    "#",
+    "Academic Year",
+    "Title",
+    "Description",
+    "ClosureDate",
+    "FinalClosureDate",
+    "Action",
+  ];
+  const [annualMagazines, setAnnualMagazine] = useState([]);
   const [modelTitle, setModelTitle] = useState("Add new Faculty");
   const [show, setShow] = useState(false);
   const [formData, setFormData] = useState({
-    facultyId: "",
-    name: "",
+    annualMagazineId: "",
+    academicYear: "",
+    title: "",
     description: "",
+    closureDate: "",
+    finalClosureDate: "",
   });
   const [error, setError] = useState({});
 
@@ -22,43 +34,51 @@ const FacultyPage = () => {
     setShow(false);
     setError({});
     setFormData({
-      facultyId: "",
-      name: "",
+      annualMagazineId: "",
+      academicYear: "",
+      title: "",
       description: "",
+      closureDate: "",
+      finalClosureDate: "",
     });
   };
 
   const handleShow = () => {
     setShow(true);
-    setModelTitle("Add new Faculty");
+    setModelTitle("Add new Annual Magazine");
   };
 
   // Edit
   const showEdit = (id) => {
-    const faculty = faculties.find((faculty) => {
-      return faculty.facultyId === id;
+    const annualMagazine = annualMagazines.find((annualMagazine) => {
+      return annualMagazine.annualMagazineId === id;
     });
 
     setFormData((previousState) => {
       return {
         ...previousState,
-        facultyId: faculty.facultyId,
-        name: faculty.name,
-        description: faculty.description,
+        annualMagazineId: annualMagazine.annualMagazineId,
+        academicYear: annualMagazine.academicYear,
+        title: annualMagazine.title,
+        description: annualMagazine.description,
+        closureDate: annualMagazine.closureDate,
+        finalClosureDate: annualMagazine.finalClosureDate,
       };
     });
 
     setShow(true);
-    setModelTitle("View/Edit Faculty");
+    setModelTitle("View/Edit Annual Magazine");
   };
 
   // Remove
   const handleRemove = (id) => {
-    swalService.confirmDelete(() => {
+    swalService.confirmDelete(async () => {
       try {
-        facultyApi.Remove(id);
-        setFaculties((previousState) => {
-          return previousState.filter((faculty) => faculty.facultyId !== id);
+        await annualMagazineApi.Remove(id);
+        setAnnualMagazine((previousState) => {
+          return previousState.filter(
+            (annualMagazine) => annualMagazine.annualMagazineId !== id
+          );
         });
       } catch (error) {
         handleErrors(error);
@@ -68,8 +88,11 @@ const FacultyPage = () => {
 
   // Yup validation
   const schema = yup.object().shape({
-    name: yup.string().required("Name is required"),
+    academicYear: yup.string().required("Academic Year is required"),
+    title: yup.string().required("Title is required"),
     description: yup.string().required("Description is required"),
+    closureDate: yup.string().required("Closure Date is required"),
+    finalClosureDate: yup.string().required("Final Closure Date is required"),
   });
 
   const handleChange = (event) => {
@@ -86,15 +109,17 @@ const FacultyPage = () => {
     try {
       await schema.validate(formData, { abortEarly: false });
 
-      if (formData.facultyId) {
+      if (formData.annualMagazineId) {
         try {
-          const response = await facultyApi.Update(formData);
-          setFaculties((previousState) => {
-            return previousState.map((faculty) => {
-              if (faculty.facultyId === formData.facultyId) {
+          const response = await annualMagazineApi.Update(formData);
+          setAnnualMagazine((previousState) => {
+            return previousState.map((annualMagazine) => {
+              if (
+                annualMagazine.annualMagazineId === formData.annualMagazineId
+              ) {
                 return response;
               }
-              return faculty;
+              return annualMagazine;
             });
           });
           handleClose();
@@ -103,8 +128,8 @@ const FacultyPage = () => {
         }
       } else {
         try {
-          const response = await facultyApi.AddNew(formData);
-          setFaculties((previousState) => {
+          const response = await annualMagazineApi.AddNew(formData);
+          setAnnualMagazine((previousState) => {
             return [...previousState, response];
           });
           handleClose();
@@ -140,8 +165,8 @@ const FacultyPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await facultyApi.getAll();
-        setFaculties(response);
+        const response = await annualMagazineApi.getAll();
+        setAnnualMagazine(response);
       } catch (error) {
         handleErrors(error);
       }
@@ -153,7 +178,7 @@ const FacultyPage = () => {
   return (
     <>
       <AdminLayout>
-        <h3 className="text-center fw-bold">Faculty Management</h3>
+        <h3 className="text-center fw-bold">Annual Magazine Management</h3>
         <nav className="navbar navbar-light bg-light mb-2">
           <div className="container-fluid">
             <form className="d-flex">
@@ -184,31 +209,48 @@ const FacultyPage = () => {
                 </Modal.Header>
                 <Modal.Body>
                   <div className="mb-3">
-                    <label htmlFor="facultyName" className="form-label">
-                      Name of Faculty
+                    <label htmlFor="academicYear" className="form-label">
+                      Academic Year
                     </label>
                     <input
                       type="text"
                       className="form-control"
-                      id="facultyName"
-                      name="name"
-                      value={formData.name}
+                      id="academicYear"
+                      name="academicYear"
+                      value={formData.academicYear}
                       onChange={handleChange}
                     />
                     <div className="invalid-feedback">
-                      {error.name ? error.name : ""}
+                      {error.academicYear ? error.academicYear : ""}
                     </div>
                   </div>
-                  <div className="mb-3">
-                    <label htmlFor="facultyDescription" className="form-label">
-                      Description
+
+                  <div>
+                    <label htmlFor="title" className="form-label">
+                      Title
                     </label>
-                    <textarea
+                    <input
                       type="text"
                       className="form-control"
-                      id="facultyDescription"
+                      id="title"
+                      name="title"
+                      value={formData.title}
+                      onChange={handleChange}
+                    />
+                    <div className="invalid-feedback">
+                      {error.title ? error.title : ""}
+                    </div>
+                  </div>
+
+                  <div className="mb-3">
+                    <label htmlFor="description" className="form-label">
+                      Description
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="description"
                       name="description"
-                      rows={4}
                       value={formData.description}
                       onChange={handleChange}
                     />
@@ -216,12 +258,46 @@ const FacultyPage = () => {
                       {error.description ? error.description : ""}
                     </div>
                   </div>
+
+                  <div className="mb-3">
+                    <label htmlFor="closureDate" className="form-label">
+                      Closure Date
+                    </label>
+                    <input
+                      type="datetime-local"
+                      className="form-control"
+                      id="closureDate"
+                      name="closureDate"
+                      value={formData.closureDate}
+                      onChange={handleChange}
+                    />
+                    <div className="invalid-feedback">
+                      {error.closureDate ? error.closureDate : ""}
+                    </div>
+                  </div>
+
+                  <div className="mb-3">
+                    <label htmlFor="finalClosureDate" className="form-label">
+                      Final Closure Date
+                    </label>
+                    <input
+                      type="datetime-local"
+                      className="form-control"
+                      id="finalClosureDate"
+                      name="finalClosureDate"
+                      value={formData.finalClosureDate}
+                      onChange={handleChange}
+                    />
+                    <div className="invalid-feedback">
+                      {error.finalClosureDate ? error.finalClosureDate : ""}
+                    </div>
+                  </div>
                 </Modal.Body>
                 <Modal.Footer>
                   <Button variant="secondary" onClick={handleClose}>
                     Close
                   </Button>
-                  <Button variant="warning" type="submit">
+                  <Button variant="primary" type="submit">
                     Submit
                   </Button>
                 </Modal.Footer>
@@ -238,21 +314,32 @@ const FacultyPage = () => {
             </tr>
           </thead>
           <tbody>
-            {faculties.map((faculty, index) => (
+            {annualMagazines.map((annualMagazine, index) => (
               <tr key={index}>
                 <td>{index + 1}</td>
-                <td>{faculty.name}</td>
-                <td>{faculty.description}</td>
+                <td>{annualMagazine.academicYear}</td>
+                <td>{annualMagazine.title}</td>
+                <td>{annualMagazine.description}</td>
+                <td>
+                  {formatDateTime.toDateTimeString(annualMagazine.closureDate)}
+                </td>
+                <td>
+                  {formatDateTime.toDateTimeString(
+                    annualMagazine.finalClosureDate
+                  )}
+                </td>
                 <td className="d-flex flex-wrap gap-2">
                   <Button
                     variant="outline-warning"
-                    onClick={() => showEdit(faculty.facultyId)}
+                    onClick={() => showEdit(annualMagazine.annualMagazineId)}
                   >
                     Edit
                   </Button>
                   <Button
                     variant="danger"
-                    onClick={() => handleRemove(faculty.facultyId)}
+                    onClick={() =>
+                      handleRemove(annualMagazine.annualMagazineId)
+                    }
                   >
                     Delete
                   </Button>
@@ -266,4 +353,4 @@ const FacultyPage = () => {
   );
 };
 
-export default FacultyPage;
+export default AnnualMagazinePage;

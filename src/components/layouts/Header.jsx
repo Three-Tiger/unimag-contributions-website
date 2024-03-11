@@ -1,9 +1,28 @@
 import React from "react";
 import UniLogo from "/image/logo.png";
 import { Button, Container, Nav, Navbar, Offcanvas } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import authService from "../../services/AuthService";
+import swalService from "../../services/SwalService";
 
 const Header = () => {
+  const navigate = useNavigate();
+
+  const isAuthenticated = () => {
+    return authService.isLogin();
+  };
+
+  const handleLogout = () => {
+    swalService.confirmToHandle(
+      "Are you sure you want to logout?",
+      "warning",
+      () => {
+        authService.logout();
+        navigate("/");
+      }
+    );
+  };
+
   return (
     <header>
       <Container fluid>
@@ -36,28 +55,38 @@ const Header = () => {
               </Offcanvas.Header>
               <Offcanvas.Body>
                 <Nav className="justify-content-start flex-grow-1 pe-3 text-center">
-                  <Nav.Link href="#action1">Home</Nav.Link>
-                  <Nav.Link href="#action2">Faculty</Nav.Link>
-                  <Nav.Link href="#action3">About</Nav.Link>
-                  <Nav.Link href="#action4">Contact</Nav.Link>
+                  <Link className="nav-link" to="/">
+                    Home
+                  </Link>
+                  <Link className="nav-link" to="/article">
+                    Article
+                  </Link>
+                  <Link className="nav-link" to="/about">
+                    About
+                  </Link>
+                  <Link className="nav-link" to="/contact">
+                    Contact
+                  </Link>
                 </Nav>
                 <div className="text-center">
-                  <Link to="/register">
-                    <Button variant="outline-warning" className="me-2">
-                      Sign Up
+                  {isAuthenticated() ? (
+                    <Button variant="outline-warning" onClick={handleLogout}>
+                      Logout
                     </Button>
-                  </Link>
-                  <Link to="/login">
-                    <Button variant="warning" className="me-4">
-                      Login
-                    </Button>
-                  </Link>
-
-                  <Link to="/contribution">
-                    <Button variant="outline-warning" className="me-2">
-                      Contribution
-                    </Button>
-                  </Link>
+                  ) : (
+                    <>
+                      <Link to="/register">
+                        <Button variant="outline-warning" className="me-2">
+                          Sign Up
+                        </Button>
+                      </Link>
+                      <Link to="/login">
+                        <Button variant="warning" className="me-4">
+                          Login
+                        </Button>
+                      </Link>
+                    </>
+                  )}
                 </div>
               </Offcanvas.Body>
             </Navbar.Offcanvas>
