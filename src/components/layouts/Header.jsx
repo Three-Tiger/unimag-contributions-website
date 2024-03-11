@@ -36,17 +36,29 @@ const Header = () => {
               </Offcanvas.Header>
               <Offcanvas.Body>
                 <Nav className="justify-content-start flex-grow-1 pe-3 text-center">
-                  <Nav.Link href="#action1">Home</Nav.Link>
-                  <Nav.Link href="#action2">Faculty</Nav.Link>
-                  <Nav.Link href="#action3">About</Nav.Link>
-                  <Nav.Link href="#action4">Contact</Nav.Link>
+                  <Link className="nav-link" to="/">
+                    Home
+                  </Link>
+                  <Link className="nav-link" to="/article">
+                    Article
+                  </Link>
+                  <Link className="nav-link" to="/about">
+                    About
+                  </Link>
+                  <Link className="nav-link" to="/contact">
+                    Contact
+                  </Link>
                 </Nav>
                 <div className="text-center">
-                  <Button variant="outline-warning" className="me-2">
-                    Sign Up
-                  </Button>
+                  <Link to="/register">
+                    <Button variant="outline-warning" className="me-2">
+                      Sign Up
+                    </Button>
+                  </Link>
                   <Link to="/login">
-                    <Button variant="warning">Login</Button>
+                    <Button variant="warning" className="me-4">
+                      Login
+                    </Button>
                   </Link>
                 </div>
               </Offcanvas.Body>

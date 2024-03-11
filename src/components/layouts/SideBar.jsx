@@ -5,28 +5,28 @@ const SideBar = () => {
     <aside id="sidebar" className="sidebar">
       <ul className="sidebar-nav" id="sidebar-nav">
         <li className="nav-item">
-          <Link className="nav-link " to="/dashboard">
+          <Link className="nav-link " to="/admin/dashboard">
             <i className="bi bi-grid"></i>
             <span>Dashboard</span>
           </Link>
         </li>
 
         <li className="nav-item">
-          <Link className="nav-link collapsed" to="/faculty">
+          <Link className="nav-link collapsed" to="/admin/faculty">
             <i className="bi bi-person-workspace"></i>
             <span>Faculty</span>
           </Link>
         </li>
 
         <li className="nav-item">
-          <Link className="nav-link collapsed" to="/annual-magazine">
+          <Link className="nav-link collapsed" to="/admin/annual-magazine">
             <i className="bi bi-calendar"></i>
             <span>Annual Magazine</span>
           </Link>
         </li>
 
         <li className="nav-item">
-          <Link className="nav-link collapsed" to="/contribution">
+          <Link className="nav-link collapsed" to="/admin/contribution">
             <i className="bi bi-book"></i>
             <span>Contribution</span>
           </Link>

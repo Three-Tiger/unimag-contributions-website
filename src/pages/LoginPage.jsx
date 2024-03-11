@@ -1,8 +1,72 @@
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import FullLayout from "../components/layouts/Full";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import userApi from "../api/userApi";
+import * as yup from "yup";
+import swalService from "../services/SwalService";
+import authService from "../services/AuthService";
 
 function LoginPage() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState({});
+
+  // Yup validation
+  const schema = yup.object().shape({
+    email: yup.string().email().required("Email is required"),
+    password: yup.string().required("Password is required"),
+  });
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  // Form
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      await schema.validate(formData, { abortEarly: false });
+
+      try {
+        const response = await userApi.login(formData);
+        authService.saveUser(response);
+        navigate("/");
+      } catch (error) {
+        handleErrors(error);
+      }
+    } catch (error) {
+      const newError = {};
+      error.inner.forEach((e) => {
+        newError[e.path] = e.message;
+      });
+      setError(newError);
+    }
+  };
+
+  const handleErrors = (error) => {
+    if (error.response.status >= 400 && error.response.status < 500) {
+      swalService.showMessage(
+        "Warning",
+        error.response.data.message,
+        "warning"
+      );
+    } else {
+      swalService.showMessage(
+        "Error",
+        "Something went wrong. Please try again later.",
+        "error"
+      );
+    }
+  };
+
   return (
     <>
       <FullLayout>
@@ -18,13 +82,18 @@ function LoginPage() {
                     Welcome back! Please log in to access your account.
                   </Card.Subtitle>
                   <Card.Text>
-                    <Form>
+                    <Form onSubmit={handleSubmit}>
                       <Form.Group className="mb-3" controlId="formBasicEmail">
                         <Form.Label>Email</Form.Label>
                         <Form.Control
                           type="email"
-                          placeholder="Enter your email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleChange}
                         />
+                        <div className="invalid-feedback">
+                          {error.email ? error.email : ""}
+                        </div>
                       </Form.Group>
 
                       <Form.Group
@@ -34,8 +103,13 @@ function LoginPage() {
                         <Form.Label>Password</Form.Label>
                         <Form.Control
                           type="password"
-                          placeholder="Enter your password"
+                          name="password"
+                          value={formData.password}
+                          onChange={handleChange}
                         />
+                        <div className="invalid-feedback">
+                          {error.password ? error.password : ""}
+                        </div>
                       </Form.Group>
                       <Form.Group className="mb-3 text-end">
                         <Form.Text className="text-muted">

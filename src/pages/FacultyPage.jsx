@@ -203,11 +203,12 @@ const FacultyPage = () => {
                     <label htmlFor="facultyDescription" className="form-label">
                       Description
                     </label>
-                    <input
+                    <textarea
                       type="text"
                       className="form-control"
                       id="facultyDescription"
                       name="description"
+                      rows={4}
                       value={formData.description}
                       onChange={handleChange}
                     />
@@ -220,7 +221,7 @@ const FacultyPage = () => {
                   <Button variant="secondary" onClick={handleClose}>
                     Close
                   </Button>
-                  <Button variant="primary" type="submit">
+                  <Button variant="warning" type="submit">
                     Submit
                   </Button>
                 </Modal.Footer>

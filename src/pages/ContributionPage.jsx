@@ -5,7 +5,7 @@ import annualMagazineApi from "../api/annualMagazine";
 import swalService from "../services/SwalService";
 import ContributionComponent from "../components/contribution/ContributionComponent";
 
-const ContributionPage2 = () => {
+const ContributionPage = () => {
   const [annualMagazines, setAnnualMagazines] = useState([]);
   const [key, setKey] = useState("");
 
@@ -65,4 +65,4 @@ const ContributionPage2 = () => {
   );
 };
 
-export default ContributionPage2;
+export default ContributionPage;
