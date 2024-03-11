@@ -1,6 +1,15 @@
 import storageService from "./StorageService";
 
 class AuthService {
+    logout() {
+        this.clearLogin();
+    }
+
+    clearLogin() {
+        storageService.remove('ACCESS_TOKEN');
+        storageService.remove('USER_ROLE');
+    }
+
     saveToken(token) {
         storageService.save('ACCESS_TOKEN', token);
     }

@@ -1,9 +1,28 @@
 import React from "react";
 import UniLogo from "/image/logo.png";
 import { Button, Container, Nav, Navbar, Offcanvas } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import authService from "../../services/AuthService";
+import swalService from "../../services/SwalService";
 
 const Header = () => {
+  const navigate = useNavigate();
+
+  const isAuthenticated = () => {
+    return authService.isLogin();
+  };
+
+  const handleLogout = () => {
+    swalService.confirmToHandle(
+      "Are you sure you want to logout?",
+      "warning",
+      () => {
+        authService.logout();
+        navigate("/");
+      }
+    );
+  };
+
   return (
     <header>
       <Container fluid>
@@ -50,16 +69,24 @@ const Header = () => {
                   </Link>
                 </Nav>
                 <div className="text-center">
-                  <Link to="/register">
-                    <Button variant="outline-warning" className="me-2">
-                      Sign Up
+                  {isAuthenticated() ? (
+                    <Button variant="outline-warning" onClick={handleLogout}>
+                      Logout
                     </Button>
-                  </Link>
-                  <Link to="/login">
-                    <Button variant="warning" className="me-4">
-                      Login
-                    </Button>
-                  </Link>
+                  ) : (
+                    <>
+                      <Link to="/register">
+                        <Button variant="outline-warning" className="me-2">
+                          Sign Up
+                        </Button>
+                      </Link>
+                      <Link to="/login">
+                        <Button variant="warning" className="me-4">
+                          Login
+                        </Button>
+                      </Link>
+                    </>
+                  )}
                 </div>
               </Offcanvas.Body>
             </Navbar.Offcanvas>

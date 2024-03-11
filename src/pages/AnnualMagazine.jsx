@@ -181,7 +181,7 @@ const AnnualMagazinePage = () => {
         <h3 className="text-center fw-bold">Annual Magazine Management</h3>
         <nav className="navbar navbar-light bg-light mb-2">
           <div className="container-fluid">
-            <Form className="d-flex">
+            <form className="d-flex">
               <input
                 className="form-control me-2"
                 type="search"
@@ -191,7 +191,7 @@ const AnnualMagazinePage = () => {
               <Button variant="outline-warning" type="submit">
                 Search
               </Button>
-            </Form>
+            </form>
             <Button variant="warning" onClick={handleShow}>
               <i className="bi bi-plus-circle"></i> Add
             </Button>

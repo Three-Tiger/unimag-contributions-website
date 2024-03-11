@@ -143,7 +143,7 @@ function HomePage() {
           <Container>
             <div className="d-flex justify-content-between align-items-center mb-5">
               <h2 className="fw-bold mb-0">Faculty</h2>
-              <Link to="/allFaculty">
+              <Link to="/faculty">
                 <Button variant="outline-warning">View All</Button>
               </Link>
             </div>

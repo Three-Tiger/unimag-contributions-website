@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Card, Col, Container, Row, Form } from "react-bootstrap";
 import FullLayout from "../components/layouts/Full";
 
-const Submition = () => {
+const SubmissionPage = () => {
   return (
     <FullLayout>
       <Container>
@@ -68,4 +68,4 @@ const Submition = () => {
   );
 };
 
-export default Submition;
+export default SubmissionPage;

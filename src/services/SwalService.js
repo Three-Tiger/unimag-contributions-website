@@ -30,6 +30,7 @@ class SwalService {
             showDenyButton: true,
             confirmButtonColor: "#dc3545",
             confirmButtonText: "Yes",
+            denyButtonColor: 'gray',
             cancelButtonText: "No",
         });
         if (result.isConfirmed) {
