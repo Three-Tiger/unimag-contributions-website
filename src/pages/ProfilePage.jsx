@@ -117,7 +117,6 @@ const ProfilePage = () => {
         if (userData.profilePicture) {
           setPreviewImage(`/api/users/${userData.userId}/image`);
         }
-        console.log(formData);
       } catch (error) {
         handleError.showError(error);
       }

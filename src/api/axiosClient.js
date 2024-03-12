@@ -49,7 +49,7 @@ axiosClient.interceptors.response.use(
                     'Session Expired',
                     'Your session has expired. Please login again.',
                     'error',
-                    this.logout.bind(this)
+                    logout.bind(this)
                 );
             }
         }
