@@ -10,6 +10,16 @@ class UserApi {
         const url = "/api/auth/login";
         return axiosClient.post(url, credentials);
     }
+
+    getById(userId) {
+        const url = `/api/users/${userId}`;
+        return axiosClient.get(url);
+    }
+
+    updateProfile(userId, data) {
+        const url = `/api/users/${userId}`;
+        return axiosClient.put(url, data);
+    }
 }
 
 const userApi = new UserApi();

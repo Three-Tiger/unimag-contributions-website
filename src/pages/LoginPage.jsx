@@ -6,6 +6,7 @@ import userApi from "../api/userApi";
 import * as yup from "yup";
 import swalService from "../services/SwalService";
 import authService from "../services/AuthService";
+import handleError from "../services/HandleErrors";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ function LoginPage() {
         }
         return navigate("/");
       } catch (error) {
-        handleErrors(error);
+        handleError.showError(error);
       }
     } catch (error) {
       const newError = {};
@@ -51,22 +52,6 @@ function LoginPage() {
         newError[e.path] = e.message;
       });
       setError(newError);
-    }
-  };
-
-  const handleErrors = (error) => {
-    if (error.response.status >= 400 && error.response.status < 500) {
-      swalService.showMessage(
-        "Warning",
-        error.response.data.message,
-        "warning"
-      );
-    } else {
-      swalService.showMessage(
-        "Error",
-        "Something went wrong. Please try again later.",
-        "error"
-      );
     }
   };
 

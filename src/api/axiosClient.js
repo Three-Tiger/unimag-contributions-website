@@ -1,6 +1,14 @@
 import axios from "axios";
+import { noAuthList } from "./noAuthList";
+import authService from "../services/AuthService";
+import storageService from "../services/StorageService";
+import swalService from "../services/SwalService";
 
 const axiosClient = axios.create();
+
+function logout() {
+    authService.logout();
+}
 
 // Interceptors
 // Add a request interceptor
@@ -14,8 +22,8 @@ axiosClient.interceptors.request.use(
             config.headers['Content-Type'] = 'application/json';
         }
 
-        const token = localStorage.getItem('token');
-        if (token) {
+        const token = authService.getAccessToken();
+        if (!noAuthList.includes(config.url) && token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
 
@@ -33,8 +41,19 @@ axiosClient.interceptors.response.use(
         return response.data;
     },
     function (error) {
-        // Any status code that falls outside the range of 2xx cause this function to trigger
-        // Do something with response error
+        /// Logout if the token has expired
+        if (error.response && error.response.status === 401) {
+            if (authService.isLogin()) {
+                storageService.clear();
+                swalService.showMessageToHandle(
+                    'Session Expired',
+                    'Your session has expired. Please login again.',
+                    'error',
+                    this.logout.bind(this)
+                );
+            }
+        }
+
         return Promise.reject(error);
     }
 );

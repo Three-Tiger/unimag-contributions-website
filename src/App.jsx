@@ -16,6 +16,7 @@ import ArticlePage from "./pages/ArticlePage.jsx";
 import ContributionPage from "./pages/ContributionPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import Protected from "./components/layouts/Protected.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
 
 function App() {
   const router = useRoutes([
@@ -30,6 +31,14 @@ function App() {
     {
       path: "/register",
       element: <RegisterPage />,
+    },
+    {
+      path: "/profile",
+      element: (
+        <Protected>
+          <ProfilePage />
+        </Protected>
+      ),
     },
     {
       path: "/faculty",
@@ -52,19 +61,35 @@ function App() {
       children: [
         {
           path: "dashboard",
-          element: <DashboardPage />,
+          element: (
+            <Protected>
+              <DashboardPage />
+            </Protected>
+          ),
         },
         {
           path: "faculty",
-          element: <FacultyPage />,
+          element: (
+            <Protected>
+              <FacultyPage />
+            </Protected>
+          ),
         },
         {
           path: "annual-magazine",
-          element: <AnnualMagazinePage />,
+          element: (
+            <Protected>
+              <AnnualMagazinePage />
+            </Protected>
+          ),
         },
         {
           path: "contribution",
-          element: <ContributionPage />,
+          element: (
+            <Protected>
+              <ContributionPage />
+            </Protected>
+          ),
         },
       ],
     },

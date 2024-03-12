@@ -6,6 +6,7 @@ import * as yup from "yup";
 import swalService from "../services/SwalService";
 import annualMagazineApi from "../api/annualMagazine";
 import formatDateTime from "../services/FormatDateTime";
+import handleError from "../services/HandleErrors";
 
 const AnnualMagazinePage = () => {
   const row = [
@@ -81,7 +82,7 @@ const AnnualMagazinePage = () => {
           );
         });
       } catch (error) {
-        handleErrors(error);
+        handleError.showError(error);
       }
     });
   };
@@ -124,7 +125,7 @@ const AnnualMagazinePage = () => {
           });
           handleClose();
         } catch (error) {
-          handleErrors(error);
+          handleError.showError(error);
         }
       } else {
         try {
@@ -134,7 +135,7 @@ const AnnualMagazinePage = () => {
           });
           handleClose();
         } catch (error) {
-          handleErrors(error);
+          handleError.showError(error);
         }
       }
     } catch (error) {
@@ -146,29 +147,13 @@ const AnnualMagazinePage = () => {
     }
   };
 
-  const handleErrors = (error) => {
-    if (error.response.status >= 400 && error.response.status < 500) {
-      swalService.showMessage(
-        "Warning",
-        error.response.data.message,
-        "warning"
-      );
-    } else {
-      swalService.showMessage(
-        "Error",
-        "Something went wrong. Please try again later.",
-        "error"
-      );
-    }
-  };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await annualMagazineApi.getAll();
         setAnnualMagazine(response);
       } catch (error) {
-        handleErrors(error);
+        handleError.showError(error);
       }
     };
 

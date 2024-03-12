@@ -4,26 +4,11 @@ import { Tab, Tabs } from "react-bootstrap";
 import annualMagazineApi from "../api/annualMagazine";
 import swalService from "../services/SwalService";
 import ContributionComponent from "../components/contribution/ContributionComponent";
+import handleError from "../services/HandleErrors";
 
 const ContributionPage = () => {
   const [annualMagazines, setAnnualMagazines] = useState([]);
   const [key, setKey] = useState("");
-
-  const handleErrors = (error) => {
-    if (error.response.status >= 400 && error.response.status < 500) {
-      swalService.showMessage(
-        "Warning",
-        error.response.data.message,
-        "warning"
-      );
-    } else {
-      swalService.showMessage(
-        "Error",
-        "Something went wrong. Please try again later.",
-        "error"
-      );
-    }
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,7 +20,7 @@ const ContributionPage = () => {
           setKey(response[0].academicYear);
         }
       } catch (error) {
-        handleErrors(error);
+        handleError.showError(error);
       }
     };
 
