@@ -1,67 +1,93 @@
-import React from "react";
-import { Button, Card, Col, Container, Row, Form } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import {
+  Button,
+  Card,
+  Col,
+  Container,
+  Row,
+  Form,
+  Nav,
+  Tab,
+} from "react-bootstrap";
 import FullLayout from "../components/layouts/Full";
+import annualMagazineApi from "../api/annualMagazine";
+import SubmissionComponent from "../components/SubmissionComponent";
 
 const SubmissionPage = () => {
+  const [annualMagazines, setAnnualMagazines] = useState([]);
+  const [eventKey, setEventKey] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await annualMagazineApi.getAll();
+
+        setAnnualMagazines(response);
+        if (response.length > 0) {
+          setEventKey(response[0].academicYear);
+        }
+      } catch (error) {
+        handleError.showError(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <FullLayout>
       <Container>
-        <Row className="align-items-end mb-5 py-5 ">
+        <Row className="align-items-center mb-5 py-5">
           <Col>
-            <h2 className="py-5 fw-bold px-3">UI/UX Design Course Submit</h2>
+            <h2 className="fw-bold px-3 mb-0">Submit your contribution</h2>
           </Col>
           <Col>
-            <p className="">
-              Welcome to our UI/UX Design course! This comprehensive program
-              will equip you with the knowledge and skills to create exceptional
-              user interfaces (UI) and enhance user experiences (UX). Dive into
-              the world of design thinking, wireframing, prototyping, and
-              usability testing. Below is an overview of the curriculum
+            <p className="m-0">
+              You will submit articles on this page. You can view and filter
+              your posts here.
             </p>
           </Col>
-          <Row className="justify-content-center">
-            <Col md={10}>
-              <div className="img-fluid mt-4 py-4 text-center">
-                {" "}
-                <img src="image/home/article5.png" />
-              </div>
-            </Col>
-          </Row>
         </Row>
-
-        <Card.Title className="text-center">
-          <h2 className="fw-bold">Requirements</h2>
-        </Card.Title>
         <Row>
           <Col md={12}>
-            <Card className="mb-4">
-              <Card.Body>
-                <div className="d-flex justify-content-between align-items-center mt-4">
-                  <Form style={{ width: "100%", height: "100%" }}>
-                    <Form.Group className="mb-3 mt-4" controlId="#">
-                      <Form.Label>File Upload</Form.Label>
-                      <Form.Control type="email" placeholder="File status" />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                      <Form.Check
-                        type="checkbox"
-                        label="Are you sure to submit?"
-                      />
-                    </Form.Group>
-                    <div className="d-flex justify-content-center mt-4">
-                      <Button variant="outline-warning" className="me-4">
-                        Update
-                      </Button>
-                      <Button variant="warning" type="submit">
-                        Submit
-                      </Button>
-                    </div>
-                  </Form>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>{" "}
+            {annualMagazines.length > 0 && (
+              <Tab.Container
+                id="left-tabs-example"
+                defaultActiveKey={annualMagazines[0].academicYear}
+                onSelect={(k) => setEventKey(k)}
+              >
+                <Row>
+                  <Col sm={2}>
+                    <Nav variant="pills" className="flex-column">
+                      {annualMagazines.map((annualMagazine, index) => (
+                        <Nav.Item key={index}>
+                          <Nav.Link eventKey={annualMagazine.academicYear}>
+                            {annualMagazine.academicYear}
+                          </Nav.Link>
+                        </Nav.Item>
+                      ))}
+                    </Nav>
+                  </Col>
+                  <Col sm={10}>
+                    <Tab.Content>
+                      {annualMagazines.map((annualMagazine, index) => (
+                        <Tab.Pane
+                          key={index}
+                          eventKey={annualMagazine.academicYear}
+                        >
+                          {eventKey === annualMagazine.academicYear && (
+                            <SubmissionComponent
+                              annualMagazine={annualMagazine}
+                            />
+                          )}
+                        </Tab.Pane>
+                      ))}
+                    </Tab.Content>
+                  </Col>
+                </Row>
+              </Tab.Container>
+            )}
+          </Col>
         </Row>
       </Container>
     </FullLayout>

@@ -1,12 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import UniLogo from "/image/logo.png";
-import { Button, Container, Nav, Navbar, Offcanvas } from "react-bootstrap";
+import {
+  Button,
+  Container,
+  Dropdown,
+  Image,
+  Nav,
+  Navbar,
+  Offcanvas,
+} from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import authService from "../../services/AuthService";
 import swalService from "../../services/SwalService";
 
 const Header = () => {
+  const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const user = authService.getUserData();
+    setUserData(user);
+  }, []);
 
   const isAuthenticated = () => {
     return authService.isLogin();
@@ -54,12 +68,15 @@ const Header = () => {
                 </Offcanvas.Title>
               </Offcanvas.Header>
               <Offcanvas.Body>
-                <Nav className="justify-content-start flex-grow-1 pe-3 text-center">
+                <Nav className="justify-content-start flex-grow-1 text-center">
                   <Link className="nav-link" to="/">
                     Home
                   </Link>
                   <Link className="nav-link" to="/article">
                     Article
+                  </Link>
+                  <Link className="nav-link" to="/submission">
+                    Submission
                   </Link>
                   <Link className="nav-link" to="/about">
                     About
@@ -70,9 +87,62 @@ const Header = () => {
                 </Nav>
                 <div className="text-center">
                   {isAuthenticated() ? (
-                    <Button variant="outline-warning" onClick={handleLogout}>
-                      Logout
-                    </Button>
+                    <>
+                      <div className="btn-group">
+                        <button
+                          type="button"
+                          className="btn btn-light dropdown-toggle"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                        >
+                          <Image
+                            src={
+                              userData?.profilePicture
+                                ? `/api/users/${userData?.userId}/image`
+                                : "/image/default-avatar.png"
+                            }
+                            width={30}
+                            height={30}
+                            roundedCircle
+                          />
+                        </button>
+                        <ul className="dropdown-menu">
+                          <li>
+                            <a className="dropdown-item" href="#">
+                              Hi {userData?.firstName}
+                            </a>
+                          </li>
+                          <li>
+                            <hr className="dropdown-divider" />
+                          </li>
+                          <li>
+                            <Link className="dropdown-item" to="/profile">
+                              My Profile
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              className="dropdown-item"
+                              to="my-contribution"
+                            >
+                              My Contribution
+                            </Link>
+                          </li>
+                          <li>
+                            <hr className="dropdown-divider" />
+                          </li>
+                          <li>
+                            <a
+                              className="dropdown-item"
+                              href="#"
+                              onClick={handleLogout}
+                            >
+                              Logout
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+                    </>
                   ) : (
                     <>
                       <Link to="/register">

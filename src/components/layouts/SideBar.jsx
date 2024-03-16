@@ -1,6 +1,21 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import swalService from "../../services/SwalService";
+import authService from "../../services/AuthService";
 
 const SideBar = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    swalService.confirmToHandle(
+      "Are you sure you want to logout?",
+      "warning",
+      () => {
+        authService.logout();
+        navigate("/");
+      }
+    );
+  };
+
   return (
     <aside id="sidebar" className="sidebar">
       <ul className="sidebar-nav" id="sidebar-nav">
@@ -40,7 +55,11 @@ const SideBar = () => {
         </li>
 
         <li className="nav-item">
-          <a className="nav-link collapsed" href="pages-register.html">
+          <a
+            className="nav-link collapsed"
+            style={{ cursor: "pointer" }}
+            onClick={handleLogout}
+          >
             <i className="bi bi-box-arrow-right"></i>
             <span>Logout</span>
           </a>

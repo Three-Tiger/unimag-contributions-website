@@ -8,6 +8,7 @@ class AuthService {
     clearLogin() {
         storageService.remove('ACCESS_TOKEN');
         storageService.remove('USER_ROLE');
+        storageService.remove('USER_DATA');
     }
 
     saveToken(token) {
@@ -17,6 +18,7 @@ class AuthService {
     saveUser(user) {
         this.saveToken(user.accessToken);
         storageService.save('USER_ROLE', user.role);
+        storageService.save('USER_DATA', user.user);
     }
 
     getAccessToken() {
@@ -29,6 +31,13 @@ class AuthService {
     getUserRole() {
         if (storageService.get('USER_ROLE')) {
             return storageService.get('USER_ROLE');
+        }
+        return null;
+    }
+
+    getUserData() {
+        if (storageService.get('USER_DATA')) {
+            return storageService.get('USER_DATA');
         }
         return null;
     }

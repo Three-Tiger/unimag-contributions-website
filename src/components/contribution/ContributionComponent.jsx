@@ -1,24 +1,9 @@
 import { useEffect, useState } from "react";
 import contributionApi from "../../api/contributionApi";
+import handleError from "../../services/HandleErrors";
 
 const ContributionComponent = ({ annualMagazine }) => {
   const [contributions, setContributions] = useState([]);
-
-  const handleErrors = (error) => {
-    if (error.response.status >= 400 && error.response.status < 500) {
-      swalService.showMessage(
-        "Warning",
-        error.response.data.message,
-        "warning"
-      );
-    } else {
-      swalService.showMessage(
-        "Error",
-        "Something went wrong. Please try again later.",
-        "error"
-      );
-    }
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,10 +12,9 @@ const ContributionComponent = ({ annualMagazine }) => {
           await contributionApi.getContributionsByAnnualMagazineId(
             annualMagazine.annualMagazineId
           );
-
         setContributions(response);
       } catch (error) {
-        handleErrors(error);
+        handleError.showError(error);
       }
     };
 

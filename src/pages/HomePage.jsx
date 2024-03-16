@@ -4,25 +4,10 @@ import FullLayout from "../components/layouts/Full";
 import { Badge, Button, Card, Col, Container, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import facultyApi from "../api/facultyApi";
+import handleError from "../services/HandleErrors";
 
 function HomePage() {
   const [faculties, setFaculties] = useState([]);
-
-  const handleErrors = (error) => {
-    if (error.response.status >= 400 && error.response.status < 500) {
-      swalService.showMessage(
-        "Warning",
-        error.response.data.message,
-        "warning"
-      );
-    } else {
-      swalService.showMessage(
-        "Error",
-        "Something went wrong. Please try again later.",
-        "error"
-      );
-    }
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,7 +15,7 @@ function HomePage() {
         const response = await facultyApi.getAll();
         setFaculties(response);
       } catch (error) {
-        handleErrors(error);
+        handleError.showError(error);
       }
     };
 
