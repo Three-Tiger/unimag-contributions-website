@@ -14,6 +14,7 @@ import swalService from "../services/SwalService";
 import facultyApi from "../api/facultyApi";
 import * as yup from "yup";
 import userApi from "../api/userApi";
+import handleError from "../services/HandleErrors";
 
 function RegisterPage() {
   const navigate = useNavigate();
@@ -44,7 +45,10 @@ function RegisterPage() {
     firstName: yup.string().required("First Name is required"),
     lastName: yup.string().required("Last Name is required"),
     dateOfBirth: yup.string().required("Date of Birth is required"),
-    phoneNumber: yup.string().required("Phone Number is required"),
+    phoneNumber: yup
+      .string()
+      .required("Phone Number is required")
+      .matches(/^[0-9]{10}$/, "Phone number is not valid"),
     address: yup.string().required("Address is required"),
     facultyId: yup.string().required("Faculty is required"),
   });
@@ -98,6 +102,7 @@ function RegisterPage() {
           () => navigate("/login")
         );
       } catch (error) {
+        console.log("🚀 ~ handleSubmit ~ error:", error);
         handleError.showError(error);
       }
     } catch (error) {

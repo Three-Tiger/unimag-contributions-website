@@ -20,12 +20,20 @@ const ProfilePage = () => {
     dateOfBirth: "",
     phoneNumber: "",
     address: "",
-    profilePicture: null,
+    profilePicture: "",
+    newProfilePicture: null,
     facultyId: "",
   });
+  const [formChangePassword, setFormChangePassword] = useState({
+    currentPassword: "",
+    newPassword: "",
+    reNewPassword: "",
+  });
+  const [error, setError] = useState({});
+  const [errorChangePassword, setErrorChangePassword] = useState({});
   const [previewImage, setPreviewImage] = useState("/image/default-avatar.png");
 
-  // Yup validation
+  // Yup validation update profile
   const schema = yup.object().shape({
     email: yup.string(),
     firstName: yup.string().required("First Name is required"),
@@ -36,10 +44,30 @@ const ProfilePage = () => {
     facultyId: yup.string().required("Faculty is required"),
   });
 
+  // Yup validation change password
+  const schemaChangePassword = yup.object().shape({
+    currentPassword: yup.string().required("Current Password is required"),
+    newPassword: yup.string().required("New Password is required"),
+    reNewPassword: yup
+      .string()
+      .required("Re-enter New Password is required")
+      .oneOf([yup.ref("newPassword"), null], "Passwords must match"),
+  });
+
+  // Handle change update profile
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData({
       ...formData,
+      [name]: value,
+    });
+  };
+
+  // Handle change change password
+  const handleChangeChangePassword = (event) => {
+    const { name, value } = event.target;
+    setFormChangePassword({
+      ...formChangePassword,
       [name]: value,
     });
   };
@@ -55,11 +83,11 @@ const ProfilePage = () => {
 
     setFormData({
       ...formData,
-      profilePicture: file,
+      newProfilePicture: file,
     });
   };
 
-  // Form
+  // Form update profile
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -68,14 +96,14 @@ const ProfilePage = () => {
       try {
         const formDataSubmit = new FormData();
         formDataSubmit.append("email", formData.email);
-        formDataSubmit.append("password", formData.password);
         formDataSubmit.append("firstName", formData.firstName);
         formDataSubmit.append("lastName", formData.lastName);
         formDataSubmit.append("dateOfBirth", formData.dateOfBirth);
         formDataSubmit.append("phoneNumber", formData.phoneNumber);
         formDataSubmit.append("address", formData.address);
-        formDataSubmit.append("facultyId", formData.facultyId);
         formDataSubmit.append("profilePicture", formData.profilePicture);
+        formDataSubmit.append("facultyId", formData.facultyId);
+        formDataSubmit.append("newProfilePicture", formData.newProfilePicture);
 
         const userId = authService.getUserData().userId;
         const response = await userApi.updateProfile(userId, formDataSubmit);
@@ -97,6 +125,39 @@ const ProfilePage = () => {
     }
   };
 
+  // Form change password
+  const handleSubmitChangePassword = async (event) => {
+    event.preventDefault();
+    try {
+      await schemaChangePassword.validate(formChangePassword, {
+        abortEarly: false,
+      });
+
+      try {
+        const userId = authService.getUserData().userId;
+        const response = await userApi.changePassword(
+          userId,
+          formChangePassword
+        );
+        setErrorChangePassword({});
+        setFormChangePassword({
+          currentPassword: "",
+          newPassword: "",
+          reNewPassword: "",
+        });
+        swalService.showMessage("Success", response.message, "success");
+      } catch (error) {
+        handleError.showError(error);
+      }
+    } catch (error) {
+      const newError = {};
+      error.inner.forEach((e) => {
+        newError[e.path] = e.message;
+      });
+      setErrorChangePassword(newError);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -112,6 +173,7 @@ const ProfilePage = () => {
           dateOfBirth: formatDateTime.toBirthdayString(userData.dateOfBirth),
           phoneNumber: userData.phoneNumber,
           address: userData.address,
+          profilePicture: userData.profilePicture,
           facultyId: userData.faculty.facultyId,
         });
         if (userData.profilePicture) {
@@ -291,6 +353,9 @@ const ProfilePage = () => {
                                 value={formData.firstName}
                                 onChange={handleChange}
                               />
+                              <div className="invalid-feedback">
+                                {error.firstName ? error.firstName : ""}
+                              </div>
                             </div>
                           </div>
 
@@ -310,6 +375,9 @@ const ProfilePage = () => {
                                 value={formData.lastName}
                                 onChange={handleChange}
                               />
+                              <div className="invalid-feedback">
+                                {error.lastName ? error.lastName : ""}
+                              </div>
                             </div>
                           </div>
 
@@ -327,7 +395,9 @@ const ProfilePage = () => {
                                 name="facultyId"
                                 onChange={handleChange}
                               >
-                                <option>Please choose your faculty</option>
+                                <option value="">
+                                  Please choose your faculty
+                                </option>
                                 {faculties.map((faculty, index) => (
                                   <option
                                     key={index}
@@ -340,6 +410,9 @@ const ProfilePage = () => {
                                   </option>
                                 ))}
                               </select>
+                              <div className="invalid-feedback">
+                                {error.facultyId ? error.facultyId : ""}
+                              </div>
                             </div>
                           </div>
 
@@ -359,25 +432,31 @@ const ProfilePage = () => {
                                 value={formData.dateOfBirth}
                                 onChange={handleChange}
                               />
+                              <div className="invalid-feedback">
+                                {error.dateOfBirth ? error.dateOfBirth : ""}
+                              </div>
                             </div>
                           </div>
 
                           <div className="row mb-3">
                             <label
-                              htmlFor="Telephone"
+                              htmlFor="phoneNumber"
                               className="col-md-4 col-lg-3 col-form-label"
                             >
                               Telephone
                             </label>
                             <div className="col-md-8 col-lg-9">
                               <input
-                                name="Telephone"
+                                name="phoneNumber"
                                 type="text"
                                 className="form-control"
-                                id="Telephone"
+                                id="phoneNumber"
                                 value={formData.phoneNumber}
                                 onChange={handleChange}
                               />
+                              <div className="invalid-feedback">
+                                {error.phoneNumber ? error.phoneNumber : ""}
+                              </div>
                             </div>
                           </div>
 
@@ -397,6 +476,9 @@ const ProfilePage = () => {
                                 value={formData.address}
                                 onChange={handleChange}
                               />
+                              <div className="invalid-feedback">
+                                {error.address ? error.address : ""}
+                              </div>
                             </div>
                           </div>
 
@@ -415,7 +497,6 @@ const ProfilePage = () => {
                                 className="form-control"
                                 id="Email"
                                 value={formData.email}
-                                onChange={handleChange}
                               />
                             </div>
                           </div>
@@ -432,7 +513,7 @@ const ProfilePage = () => {
                         className="tab-pane fade pt-3"
                         id="profile-change-password"
                       >
-                        <form>
+                        <form onSubmit={handleSubmitChangePassword}>
                           <div className="row mb-3">
                             <label
                               htmlFor="currentPassword"
@@ -442,11 +523,17 @@ const ProfilePage = () => {
                             </label>
                             <div className="col-md-8 col-lg-9">
                               <input
-                                name="password"
+                                name="currentPassword"
                                 type="password"
                                 className="form-control"
                                 id="currentPassword"
+                                onChange={handleChangeChangePassword}
                               />
+                              <div className="invalid-feedback">
+                                {errorChangePassword.currentPassword
+                                  ? errorChangePassword.currentPassword
+                                  : ""}
+                              </div>
                             </div>
                           </div>
 
@@ -459,11 +546,17 @@ const ProfilePage = () => {
                             </label>
                             <div className="col-md-8 col-lg-9">
                               <input
-                                name="newpassword"
+                                name="newPassword"
                                 type="password"
                                 className="form-control"
                                 id="newPassword"
+                                onChange={handleChangeChangePassword}
                               />
+                              <div className="invalid-feedback">
+                                {errorChangePassword.newPassword
+                                  ? errorChangePassword.newPassword
+                                  : ""}
+                              </div>
                             </div>
                           </div>
 
@@ -476,11 +569,17 @@ const ProfilePage = () => {
                             </label>
                             <div className="col-md-8 col-lg-9">
                               <input
-                                name="renewpassword"
+                                name="reNewPassword"
                                 type="password"
                                 className="form-control"
-                                id="renewPassword"
+                                id="reNewPassword"
+                                onChange={handleChangeChangePassword}
                               />
+                              <div className="invalid-feedback">
+                                {errorChangePassword.reNewPassword
+                                  ? errorChangePassword.reNewPassword
+                                  : ""}
+                              </div>
                             </div>
                           </div>
 

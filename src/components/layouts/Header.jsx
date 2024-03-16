@@ -75,6 +75,9 @@ const Header = () => {
                   <Link className="nav-link" to="/article">
                     Article
                   </Link>
+                  <Link className="nav-link" to="/submission">
+                    Submission
+                  </Link>
                   <Link className="nav-link" to="/about">
                     About
                   </Link>
@@ -84,9 +87,6 @@ const Header = () => {
                 </Nav>
                 <div className="text-center">
                   {isAuthenticated() ? (
-                    // <Button variant="outline-warning" onClick={handleLogout}>
-                    //   Logout
-                    // </Button>
                     <>
                       <div className="btn-group">
                         <button

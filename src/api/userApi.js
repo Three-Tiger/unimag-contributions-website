@@ -20,6 +20,11 @@ class UserApi {
         const url = `/api/users/${userId}`;
         return axiosClient.put(url, data);
     }
+
+    changePassword(userId, data) {
+        const url = `/api/users/${userId}/change-password`;
+        return axiosClient.put(url, data);
+    }
 }
 
 const userApi = new UserApi();

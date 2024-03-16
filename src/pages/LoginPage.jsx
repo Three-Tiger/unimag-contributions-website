@@ -39,10 +39,10 @@ function LoginPage() {
       try {
         const response = await userApi.login(formData);
         authService.saveUser(response);
-        if (response.role === "Administrator") {
-          return navigate("/admin/dashboard");
+        if (response.role === "Student") {
+          return navigate("/");
         }
-        return navigate("/");
+        return navigate("/admin/dashboard");
       } catch (error) {
         handleError.showError(error);
       }

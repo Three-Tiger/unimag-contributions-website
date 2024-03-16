@@ -10,13 +10,6 @@ class HandleError {
                     "warning"
                 );
                 break;
-            case 401:
-                swalService.showMessage(
-                    "Warning",
-                    error.response.data.message,
-                    "warning"
-                );
-                break;
             case 403:
                 swalService.showMessage(
                     "Warning",
