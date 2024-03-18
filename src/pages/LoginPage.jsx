@@ -1,4 +1,12 @@
-import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
+import {
+  Button,
+  Card,
+  Col,
+  Container,
+  Form,
+  Row,
+  Spinner,
+} from "react-bootstrap";
 import FullLayout from "../components/layouts/Full";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -9,6 +17,7 @@ import authService from "../services/AuthService";
 import handleError from "../services/HandleErrors";
 
 function LoginPage() {
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
@@ -36,6 +45,7 @@ function LoginPage() {
     try {
       await schema.validate(formData, { abortEarly: false });
 
+      setIsLoading(true);
       try {
         const response = await userApi.login(formData);
         authService.saveUser(response);
@@ -45,6 +55,8 @@ function LoginPage() {
         return navigate("/admin/dashboard");
       } catch (error) {
         handleError.showError(error);
+      } finally {
+        setIsLoading(false);
       }
     } catch (error) {
       const newError = {};
@@ -112,8 +124,16 @@ function LoginPage() {
                         <Form.Check type="checkbox" label="Rememeber me" />
                       </Form.Group>
                       <div className="d-grid">
-                        <Button variant="warning" type="submit">
-                          Login
+                        <Button
+                          variant="warning"
+                          type="submit"
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <Spinner animation="border" variant="dark" />
+                          ) : (
+                            "Login"
+                          )}
                         </Button>
                       </div>
                     </Form>

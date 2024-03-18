@@ -2,6 +2,13 @@ body {
   font-family: "Plus Jakarta Sans", sans-serif;
 }
 
+pre {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  text-align: justify;
+}
+
 .video-container {
   flex: 1 1 40rem;
   position: relative;
@@ -30,9 +37,9 @@ body {
   -moz-box-orient: vertical;
 }
 
-.invalid-feedback {
+/* .invalid-feedback {
   display: block !important;
-}
+} */
 
 .courses {
   display: grid;

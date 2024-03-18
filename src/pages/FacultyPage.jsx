@@ -1,4 +1,4 @@
-import { Button, Modal, Table } from "react-bootstrap";
+import { Button, Modal, Spinner, Table } from "react-bootstrap";
 import AdminLayout from "../components/layouts/Admin";
 import { useEffect, useState } from "react";
 import * as yup from "yup";
@@ -8,6 +8,7 @@ import handleError from "../services/HandleErrors";
 
 const FacultyPage = () => {
   const row = ["#", "Name", "Description", "Action"];
+  const [isLoading, setIsLoading] = useState(false);
   const [faculties, setFaculties] = useState([]);
   const [modelTitle, setModelTitle] = useState("Add new Faculty");
   const [show, setShow] = useState(false);
@@ -86,6 +87,7 @@ const FacultyPage = () => {
     try {
       await schema.validate(formData, { abortEarly: false });
 
+      setIsLoading(true);
       if (formData.facultyId) {
         try {
           const response = await facultyApi.Update(formData);
@@ -100,16 +102,20 @@ const FacultyPage = () => {
           handleClose();
         } catch (error) {
           handleError.showError(error);
+        } finally {
+          setIsLoading(false);
         }
       } else {
         try {
           const response = await facultyApi.AddNew(formData);
           setFaculties((previousState) => {
-            return [...previousState, response];
+            return [response, ...previousState];
           });
           handleClose();
         } catch (error) {
           handleError.showError(error);
+        } finally {
+          setIsLoading(false);
         }
       }
     } catch (error) {
@@ -162,7 +168,11 @@ const FacultyPage = () => {
               keyboard={false}
               centered
             >
-              <form onSubmit={handleSubmit}>
+              <form
+                onSubmit={handleSubmit}
+                className="needs-validation"
+                noValidate
+              >
                 <Modal.Header closeButton>
                   <Modal.Title>{modelTitle}</Modal.Title>
                 </Modal.Header>
@@ -173,15 +183,15 @@ const FacultyPage = () => {
                     </label>
                     <input
                       type="text"
-                      className="form-control"
+                      className={`form-control ${
+                        error.name ? "is-invalid" : ""
+                      }`}
                       id="facultyName"
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
                     />
-                    <div className="invalid-feedback">
-                      {error.name ? error.name : ""}
-                    </div>
+                    <div className="invalid-feedback">{error.name}</div>
                   </div>
                   <div className="mb-3">
                     <label htmlFor="facultyDescription" className="form-label">
@@ -189,24 +199,28 @@ const FacultyPage = () => {
                     </label>
                     <textarea
                       type="text"
-                      className="form-control"
+                      className={`form-control ${
+                        error.description ? "is-invalid" : ""
+                      }`}
                       id="facultyDescription"
                       name="description"
                       rows={4}
                       value={formData.description}
                       onChange={handleChange}
                     />
-                    <div className="invalid-feedback">
-                      {error.description ? error.description : ""}
-                    </div>
+                    <div className="invalid-feedback">{error.description}</div>
                   </div>
                 </Modal.Body>
                 <Modal.Footer>
                   <Button variant="secondary" onClick={handleClose}>
                     Close
                   </Button>
-                  <Button variant="warning" type="submit">
-                    Submit
+                  <Button variant="warning" type="submit" disabled={isLoading}>
+                    {isLoading ? (
+                      <Spinner animation="border" variant="dark" />
+                    ) : (
+                      "Submit"
+                    )}
                   </Button>
                 </Modal.Footer>
               </form>

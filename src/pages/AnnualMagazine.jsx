@@ -1,4 +1,4 @@
-import { Button, Modal, Table } from "react-bootstrap";
+import { Button, Modal, Spinner, Table } from "react-bootstrap";
 import AdminLayout from "../components/layouts/Admin";
 import { useEffect, useState } from "react";
 import { Form } from "react-router-dom";
@@ -18,6 +18,7 @@ const AnnualMagazinePage = () => {
     "FinalClosureDate",
     "Action",
   ];
+  const [isLoading, setIsLoading] = useState(false);
   const [annualMagazines, setAnnualMagazine] = useState([]);
   const [modelTitle, setModelTitle] = useState("Add new Faculty");
   const [show, setShow] = useState(false);
@@ -110,6 +111,7 @@ const AnnualMagazinePage = () => {
     try {
       await schema.validate(formData, { abortEarly: false });
 
+      setIsLoading(true);
       if (formData.annualMagazineId) {
         try {
           const response = await annualMagazineApi.Update(formData);
@@ -126,16 +128,20 @@ const AnnualMagazinePage = () => {
           handleClose();
         } catch (error) {
           handleError.showError(error);
+        } finally {
+          setIsLoading(false);
         }
       } else {
         try {
           const response = await annualMagazineApi.AddNew(formData);
           setAnnualMagazine((previousState) => {
-            return [...previousState, response];
+            return [response, ...previousState];
           });
           handleClose();
         } catch (error) {
           handleError.showError(error);
+        } finally {
+          setIsLoading(false);
         }
       }
     } catch (error) {
@@ -199,49 +205,50 @@ const AnnualMagazinePage = () => {
                     </label>
                     <input
                       type="text"
-                      className="form-control"
+                      className={`form-control ${
+                        error.academicYear ? "is-invalid" : ""
+                      }`}
                       id="academicYear"
                       name="academicYear"
                       value={formData.academicYear}
                       onChange={handleChange}
                     />
-                    <div className="invalid-feedback">
-                      {error.academicYear ? error.academicYear : ""}
-                    </div>
+                    <div className="invalid-feedback">{error.academicYear}</div>
                   </div>
 
-                  <div>
+                  <div className="mb-3">
                     <label htmlFor="title" className="form-label">
                       Title
                     </label>
                     <input
                       type="text"
-                      className="form-control"
+                      className={`form-control ${
+                        error.title ? "is-invalid" : ""
+                      }`}
                       id="title"
                       name="title"
                       value={formData.title}
                       onChange={handleChange}
                     />
-                    <div className="invalid-feedback">
-                      {error.title ? error.title : ""}
-                    </div>
+                    <div className="invalid-feedback">{error.title}</div>
                   </div>
 
                   <div className="mb-3">
                     <label htmlFor="description" className="form-label">
                       Description
                     </label>
-                    <input
+                    <textarea
                       type="text"
-                      className="form-control"
+                      className={`form-control ${
+                        error.description ? "is-invalid" : ""
+                      }`}
                       id="description"
                       name="description"
+                      rows={4}
                       value={formData.description}
                       onChange={handleChange}
                     />
-                    <div className="invalid-feedback">
-                      {error.description ? error.description : ""}
-                    </div>
+                    <div className="invalid-feedback">{error.description}</div>
                   </div>
 
                   <div className="mb-3">
@@ -250,15 +257,15 @@ const AnnualMagazinePage = () => {
                     </label>
                     <input
                       type="datetime-local"
-                      className="form-control"
+                      className={`form-control ${
+                        error.closureDate ? "is-invalid" : ""
+                      }`}
                       id="closureDate"
                       name="closureDate"
                       value={formData.closureDate}
                       onChange={handleChange}
                     />
-                    <div className="invalid-feedback">
-                      {error.closureDate ? error.closureDate : ""}
-                    </div>
+                    <div className="invalid-feedback">{error.closureDate}</div>
                   </div>
 
                   <div className="mb-3">
@@ -267,14 +274,16 @@ const AnnualMagazinePage = () => {
                     </label>
                     <input
                       type="datetime-local"
-                      className="form-control"
+                      className={`form-control ${
+                        error.finalClosureDate ? "is-invalid" : ""
+                      }`}
                       id="finalClosureDate"
                       name="finalClosureDate"
                       value={formData.finalClosureDate}
                       onChange={handleChange}
                     />
                     <div className="invalid-feedback">
-                      {error.finalClosureDate ? error.finalClosureDate : ""}
+                      {error.finalClosureDate}
                     </div>
                   </div>
                 </Modal.Body>
@@ -282,8 +291,12 @@ const AnnualMagazinePage = () => {
                   <Button variant="secondary" onClick={handleClose}>
                     Close
                   </Button>
-                  <Button variant="primary" type="submit">
-                    Submit
+                  <Button variant="warning" type="submit" disabled={isLoading}>
+                    {isLoading ? (
+                      <Spinner animation="border" variant="dark" />
+                    ) : (
+                      "Submit"
+                    )}
                   </Button>
                 </Modal.Footer>
               </form>

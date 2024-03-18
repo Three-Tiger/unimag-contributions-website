@@ -1,19 +1,17 @@
-import { Link, useNavigate } from "react-router-dom";
-import swalService from "../../services/SwalService";
+import { Link } from "react-router-dom";
 import authService from "../../services/AuthService";
 
 const SideBar = () => {
-  const navigate = useNavigate();
+  const isAdministrator = () => {
+    return authService.getUserData().role.name === "Administrator";
+  };
 
-  const handleLogout = () => {
-    swalService.confirmToHandle(
-      "Are you sure you want to logout?",
-      "warning",
-      () => {
-        authService.logout();
-        navigate("/");
-      }
-    );
+  const isCoordinator = () => {
+    return authService.getUserData().role.name === "Coordinator";
+  };
+
+  const isManager = () => {
+    return authService.getUserData().role.name === "Manager";
   };
 
   return (
@@ -26,44 +24,43 @@ const SideBar = () => {
           </Link>
         </li>
 
-        <li className="nav-item">
-          <Link className="nav-link collapsed" to="/admin/faculty">
-            <i className="bi bi-person-workspace"></i>
-            <span>Faculty</span>
-          </Link>
-        </li>
+        {isAdministrator() && (
+          <li className="nav-item">
+            <Link className="nav-link collapsed" to="/admin/faculty">
+              <i className="bi bi-person-workspace"></i>
+              <span>Faculty</span>
+            </Link>
+          </li>
+        )}
 
-        <li className="nav-item">
-          <Link className="nav-link collapsed" to="/admin/annual-magazine">
-            <i className="bi bi-calendar"></i>
-            <span>Annual Magazine</span>
-          </Link>
-        </li>
+        {isAdministrator() && (
+          <li className="nav-item">
+            <Link className="nav-link collapsed" to="/admin/annual-magazine">
+              <i className="bi bi-calendar"></i>
+              <span>Annual Magazine</span>
+            </Link>
+          </li>
+        )}
 
-        <li className="nav-item">
-          <Link className="nav-link collapsed" to="/admin/contribution">
-            <i className="bi bi-book"></i>
-            <span>Contribution</span>
-          </Link>
-        </li>
+        {(isCoordinator() || isManager()) && (
+          <li className="nav-item">
+            <Link className="nav-link collapsed" to="/admin/contribution">
+              <i className="bi bi-book"></i>
+              <span>
+                {isCoordinator() ? "Student Submission" : "Contribution List"}
+              </span>
+            </Link>
+          </li>
+        )}
 
-        <li className="nav-item">
-          <a className="nav-link collapsed" href="pages-contact.html">
-            <i className="bi bi-person"></i>
-            <span>User</span>
-          </a>
-        </li>
-
-        <li className="nav-item">
-          <a
-            className="nav-link collapsed"
-            style={{ cursor: "pointer" }}
-            onClick={handleLogout}
-          >
-            <i className="bi bi-box-arrow-right"></i>
-            <span>Logout</span>
-          </a>
-        </li>
+        {isAdministrator() && (
+          <li className="nav-item">
+            <Link className="nav-link collapsed" to="/admin/user">
+              <i className="bi bi-person"></i>
+              <span>User</span>
+            </Link>
+          </li>
+        )}
       </ul>
     </aside>
   );

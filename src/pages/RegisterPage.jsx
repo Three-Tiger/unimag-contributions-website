@@ -6,6 +6,7 @@ import {
   Form,
   Image,
   Row,
+  Spinner,
 } from "react-bootstrap";
 import FullLayout from "../components/layouts/Full";
 import { Link, useNavigate } from "react-router-dom";
@@ -17,6 +18,7 @@ import userApi from "../api/userApi";
 import handleError from "../services/HandleErrors";
 
 function RegisterPage() {
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [faculties, setFaculties] = useState([]);
   const [formData, setFormData] = useState({
@@ -82,6 +84,7 @@ function RegisterPage() {
     try {
       await schema.validate(formData, { abortEarly: false });
 
+      setIsLoading(true);
       try {
         const formDataSubmit = new FormData();
         formDataSubmit.append("email", formData.email);
@@ -102,8 +105,9 @@ function RegisterPage() {
           () => navigate("/login")
         );
       } catch (error) {
-        console.log("🚀 ~ handleSubmit ~ error:", error);
         handleError.showError(error);
+      } finally {
+        setIsLoading(false);
       }
     } catch (error) {
       const newError = {};
@@ -139,7 +143,11 @@ function RegisterPage() {
                     <h2 className="fw-bold">Register</h2>
                   </Card.Title>
                   <Card.Text>
-                    <Form onSubmit={handleSubmit}>
+                    <Form
+                      onSubmit={handleSubmit}
+                      className="needs-validation"
+                      noValidate
+                    >
                       <Form.Group className="mb-3 text-center">
                         <Form.Label>
                           <Image
@@ -147,6 +155,7 @@ function RegisterPage() {
                             width={100}
                             height={100}
                             roundedCircle
+                            className="mb-2"
                           />
                         </Form.Label>
                         <Form.Control
@@ -164,10 +173,11 @@ function RegisterPage() {
                           name="email"
                           value={formData.email}
                           onChange={handleChange}
+                          isInvalid={error.email}
                         />
-                        <div className="invalid-feedback">
-                          {error.email ? error.email : ""}
-                        </div>
+                        <Form.Control.Feedback type="invalid">
+                          {error.email}
+                        </Form.Control.Feedback>
                       </Form.Group>
 
                       <Form.Group className="mb-3">
@@ -177,10 +187,11 @@ function RegisterPage() {
                           name="password"
                           value={formData.password}
                           onChange={handleChange}
+                          isInvalid={error.password}
                         />
-                        <div className="invalid-feedback">
-                          {error.password ? error.password : ""}
-                        </div>
+                        <Form.Control.Feedback type="invalid">
+                          {error.password}
+                        </Form.Control.Feedback>
                       </Form.Group>
 
                       <Form.Group className="mb-3">
@@ -189,10 +200,11 @@ function RegisterPage() {
                           type="password"
                           name="confirmPassword"
                           onChange={handleChange}
+                          isInvalid={error.confirmPassword}
                         />
-                        <div className="invalid-feedback">
-                          {error.confirmPassword ? error.confirmPassword : ""}
-                        </div>
+                        <Form.Control.Feedback type="invalid">
+                          {error.confirmPassword}
+                        </Form.Control.Feedback>
                       </Form.Group>
 
                       <Form.Group className="mb-3">
@@ -201,17 +213,18 @@ function RegisterPage() {
                           aria-label="Default select example"
                           name="facultyId"
                           onChange={handleChange}
+                          isInvalid={error.facultyId}
                         >
-                          <option>Please choose your faculty</option>
+                          <option value="">Please choose your faculty</option>
                           {faculties.map((faculty, index) => (
                             <option key={index} value={faculty.facultyId}>
                               {faculty.name}
                             </option>
                           ))}
                         </Form.Select>
-                        <div className="invalid-feedback">
-                          {error.facultyId ? error.facultyId : ""}
-                        </div>
+                        <Form.Control.Feedback type="invalid">
+                          {error.facultyId}
+                        </Form.Control.Feedback>
                       </Form.Group>
 
                       <Form.Group className="mb-3">
@@ -221,10 +234,11 @@ function RegisterPage() {
                           name="firstName"
                           value={formData.firstName}
                           onChange={handleChange}
+                          isInvalid={error.firstName}
                         />
-                        <div className="invalid-feedback">
-                          {error.firstName ? error.firstName : ""}
-                        </div>
+                        <Form.Control.Feedback type="invalid">
+                          {error.firstName}
+                        </Form.Control.Feedback>
                       </Form.Group>
 
                       <Form.Group className="mb-3">
@@ -234,10 +248,11 @@ function RegisterPage() {
                           name="lastName"
                           value={formData.lastName}
                           onChange={handleChange}
+                          isInvalid={error.lastName}
                         />
-                        <div className="invalid-feedback">
-                          {error.lastName ? error.lastName : ""}
-                        </div>
+                        <Form.Control.Feedback type="invalid">
+                          {error.lastName}
+                        </Form.Control.Feedback>
                       </Form.Group>
 
                       <Form.Group className="mb-3">
@@ -247,10 +262,11 @@ function RegisterPage() {
                           name="dateOfBirth"
                           value={formData.dateOfBirth}
                           onChange={handleChange}
+                          isInvalid={error.dateOfBirth}
                         />
-                        <div className="invalid-feedback">
-                          {error.dateOfBirth ? error.dateOfBirth : ""}
-                        </div>
+                        <Form.Control.Feedback type="invalid">
+                          {error.dateOfBirth}
+                        </Form.Control.Feedback>
                       </Form.Group>
 
                       <Form.Group className="mb-3">
@@ -260,10 +276,11 @@ function RegisterPage() {
                           name="phoneNumber"
                           value={formData.phoneNumber}
                           onChange={handleChange}
+                          isInvalid={error.phoneNumber}
                         />
-                        <div className="invalid-feedback">
-                          {error.phoneNumber ? error.phoneNumber : ""}
-                        </div>
+                        <Form.Control.Feedback type="invalid">
+                          {error.phoneNumber}
+                        </Form.Control.Feedback>
                       </Form.Group>
 
                       <Form.Group className="mb-3">
@@ -273,10 +290,11 @@ function RegisterPage() {
                           name="address"
                           value={formData.address}
                           onChange={handleChange}
+                          isInvalid={error.address}
                         />
-                        <div className="invalid-feedback">
-                          {error.address ? error.address : ""}
-                        </div>
+                        <Form.Control.Feedback type="invalid">
+                          {error.address}
+                        </Form.Control.Feedback>
                       </Form.Group>
 
                       <Form.Group className="mb-3">
@@ -285,9 +303,18 @@ function RegisterPage() {
                           label="I agree to the conditions and regulations of UniMagContributions"
                         />
                       </Form.Group>
+
                       <div className="d-grid">
-                        <Button variant="warning" type="submit">
-                          Sign up
+                        <Button
+                          variant="warning"
+                          type="submit"
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <Spinner animation="border" variant="dark" />
+                          ) : (
+                            "Sign up"
+                          )}
                         </Button>
                       </div>
                     </Form>
