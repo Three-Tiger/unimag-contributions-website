@@ -10,6 +10,21 @@ class FileDetailApi {
         const url = `/api/file-details/contribution/${contributionId}`;
         return axiosClient.delete(url);
     }
+
+    downloadFile(fileId) {
+        const url = `/api/file-details/${fileId}/download`;
+        return axiosClient.get(url);
+    }
+
+    downloadMultipleFile(contributionId) {
+        const url = `/api/file-details/${contributionId}/download-multiple`;
+        return axiosClient.get(url);
+    }
+
+    downloadFileByListContributionId(listContribution) {
+        const url = `/api/file-details/contribution/download-multiple`;
+        return axiosClient.post(url, listContribution);
+    }
 }
 
 const fileDetailApi = new FileDetailApi();

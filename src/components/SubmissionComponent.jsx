@@ -1,4 +1,4 @@
-import { Badge, Button, Card, Modal, Table } from "react-bootstrap";
+import { Badge, Button, Card, Modal, Spinner, Table } from "react-bootstrap";
 import formatDateTime from "../services/FormatDateTime";
 import { useEffect, useState } from "react";
 import contributionApi from "../api/contributionApi";
@@ -9,11 +9,12 @@ import fileDetailApi from "../api/fileDetailApi";
 import imageDetailApi from "../api/imageDetailApi";
 import swalService from "../services/SwalService";
 import TextToHtmlConverter from "./TextToHtmlConverter";
+import emailApi from "../api/emailApi";
 
 const SubmissionComponent = ({ annualMagazine }) => {
   const isClosed = new Date(annualMagazine.closureDate) < new Date();
   const isFinalClosed = new Date(annualMagazine.finalClosureDate) < new Date();
-
+  const [isLoading, setIsLoading] = useState(false);
   const [contribution, setContribution] = useState({});
   const [modelTitle, setModelTitle] = useState("Add new Contribution");
   const [show, setShow] = useState(false);
@@ -142,96 +143,127 @@ const SubmissionComponent = ({ annualMagazine }) => {
         abortEarly: false,
       });
 
+      setIsLoading(true);
       if (formContribution.contributionId) {
-        const contributionData = {
-          contributionId: formContribution.contributionId,
-          title: formContribution.title,
-          submissionDate: new Date(),
-          status: contribution.status,
-          userId: authService.getUserData().userId,
-          annualMagazineId: annualMagazine.annualMagazineId,
-        };
+        try {
+          const contributionData = {
+            contributionId: formContribution.contributionId,
+            title: formContribution.title,
+            submissionDate: new Date(),
+            status: contribution.status,
+            userId: authService.getUserData().userId,
+            annualMagazineId: annualMagazine.annualMagazineId,
+          };
 
-        // Update contribution
-        await contributionApi.update(contributionData);
+          // Update contribution
+          await contributionApi.update(contributionData);
 
-        // Save file details
-        if (formContribution.fileDetails) {
-          // Delete old file details
-          await fileDetailApi.removeFileByContributionId(
-            formContribution.contributionId
-          );
+          // Save file details
+          if (formContribution.fileDetails) {
+            // Delete old file details
+            await fileDetailApi.removeFileByContributionId(
+              formContribution.contributionId
+            );
+
+            const formFileData = new FormData();
+
+            formContribution.fileDetails.forEach((file, index) => {
+              formFileData.append(
+                `fileDetails[${index}].contributionId`,
+                formContribution.contributionId
+              );
+              formFileData.append(`fileDetails[${index}].fileUpload`, file);
+            });
+
+            // Save file details
+            await fileDetailApi.save(formFileData);
+          }
+
+          // Save image details
+          if (formContribution.imageDetails) {
+            // Delete old image details
+            await imageDetailApi.removeImageByContributionId(
+              formContribution.contributionId
+            );
+
+            const formImageData = new FormData();
+            formContribution.imageDetails.forEach((image, index) => {
+              formImageData.append(
+                `imageDetails[${index}].contributionId`,
+                formContribution.contributionId
+              );
+              formImageData.append(`imageDetails[${index}].fileUpload`, image);
+            });
+
+            // Save image details
+            await imageDetailApi.save(formImageData);
+          }
+        } catch (error) {
+          handleError.showError(error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        try {
+          const contributionData = {
+            title: formContribution.title,
+            submissionDate: new Date(),
+            status: "Waiting",
+            userId: authService.getUserData().userId,
+            annualMagazineId: annualMagazine.annualMagazineId,
+          };
+
+          // Save contribution
+          const response = await contributionApi.save(contributionData);
+          const contributionId = response.contributionId;
 
           const formFileData = new FormData();
 
           formContribution.fileDetails.forEach((file, index) => {
             formFileData.append(
               `fileDetails[${index}].contributionId`,
-              formContribution.contributionId
+              contributionId
             );
             formFileData.append(`fileDetails[${index}].fileUpload`, file);
           });
 
           // Save file details
           await fileDetailApi.save(formFileData);
-        }
-
-        // Save image details
-        if (formContribution.imageDetails) {
-          // Delete old image details
-          await imageDetailApi.removeImageByContributionId(
-            formContribution.contributionId
-          );
 
           const formImageData = new FormData();
           formContribution.imageDetails.forEach((image, index) => {
             formImageData.append(
               `imageDetails[${index}].contributionId`,
-              formContribution.contributionId
+              contributionId
             );
             formImageData.append(`imageDetails[${index}].fileUpload`, image);
           });
 
           // Save image details
           await imageDetailApi.save(formImageData);
+
+          // Send email to coordinator
+          const email = {
+            to: "",
+            subject: "Notification of Student Contribution Submission",
+            content: {
+              facultyId: authService.getUserData().faculty.facultyId,
+              studentName:
+                authService.getUserData().firstName +
+                " " +
+                authService.getUserData().lastName,
+              contributionTitle: contributionData.title,
+              submissionDate: formatDateTime.toDateTimeString(
+                contributionData.submissionDate
+              ),
+            },
+          };
+          await emailApi.sendMailAsync(email);
+        } catch (error) {
+          handleError.showError(error);
+        } finally {
+          setIsLoading(false);
         }
-      } else {
-        const contributionData = {
-          title: formContribution.title,
-          submissionDate: new Date(),
-          status: "Waiting",
-          userId: authService.getUserData().userId,
-          annualMagazineId: annualMagazine.annualMagazineId,
-        };
-
-        // Save contribution
-        const response = await contributionApi.save(contributionData);
-        const contributionId = response.contributionId;
-
-        const formFileData = new FormData();
-
-        formContribution.fileDetails.forEach((file, index) => {
-          formFileData.append(
-            `fileDetails[${index}].contributionId`,
-            contributionId
-          );
-          formFileData.append(`fileDetails[${index}].fileUpload`, file);
-        });
-
-        // Save file details
-        await fileDetailApi.save(formFileData);
-
-        const formImageData = new FormData();
-        formContribution.imageDetails.forEach((image, index) => {
-          formImageData.append(
-            `imageDetails[${index}].contributionId`,
-            contributionId
-          );
-          formImageData.append(`imageDetails[${index}].fileUpload`, image);
-        });
-
-        // Save image details
-        await imageDetailApi.save(formImageData);
       }
 
       const user = authService.getUserData();
@@ -480,8 +512,12 @@ const SubmissionComponent = ({ annualMagazine }) => {
                 <Button variant="secondary" onClick={handleClose}>
                   Close
                 </Button>
-                <Button variant="primary" type="submit">
-                  Submit
+                <Button variant="warning" type="submit" disabled={isLoading}>
+                  {isLoading ? (
+                    <Spinner animation="border" variant="dark" />
+                  ) : (
+                    "Submit"
+                  )}
                 </Button>
               </Modal.Footer>
             </form>
@@ -533,9 +569,10 @@ const SubmissionComponent = ({ annualMagazine }) => {
                   <tr>
                     <td className="fw-bold col-3">Feedback comment</td>
                     <td>
-                      <TextToHtmlConverter
+                      {/* <TextToHtmlConverter
                         text={contribution.feedbacks[0].content}
-                      />
+                      /> */}
+                      <pre>{contribution.feedbacks[0].content}</pre>
                     </td>
                   </tr>
                 </tbody>

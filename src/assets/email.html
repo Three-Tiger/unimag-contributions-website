@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <!-- Bootstrap 5 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <style>
+      p {
+        margin: 0in;
+        font-size: 16px;
+        text-align: justify;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container mt-3">
+      <p>Dear [Faculty Marketing Coordinator],</p>
+      <br />
+      <p>
+        This is to inform you that a student from your faculty has submitted a
+        contribution to the annual university magazine. The details of the
+        submission are as follows:
+      </p>
+      <ul>
+        <li>
+          <p>Student Name: {{studentName}}</p>
+        </li>
+        <li>
+          <p>Contribution Title: {{contributionTitle}}</p>
+        </li>
+        <li>
+          <p>Submission Date: {{submissionDate}}</p>
+        </li>
+      </ul>
+      <p>
+        You are kindly requested to review the submission and provide any
+        necessary comments within the next 14 days. Your feedback is crucial in
+        the selection process for the magazine.
+      </p>
+      <br />
+      <p>Thank you for your attention to this matter.</p>
+      <br />
+      <p>Best regards,</p>
+    </div>
+  </body>
+</html>

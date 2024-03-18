@@ -3,7 +3,7 @@ import AdminLayout from "../components/layouts/Admin";
 import { Tab, Tabs } from "react-bootstrap";
 import annualMagazineApi from "../api/annualMagazine";
 import swalService from "../services/SwalService";
-import ContributionComponent from "../components/contribution/ContributionComponent";
+import ContributionComponent from "../components/ContributionComponent";
 import handleError from "../services/HandleErrors";
 
 const ContributionPage = () => {

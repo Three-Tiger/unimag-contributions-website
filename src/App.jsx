@@ -17,6 +17,7 @@ import ContributionPage from "./pages/ContributionPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import Protected from "./components/layouts/Protected.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
+import UserPage from "./pages/UserPage.jsx";
 
 function App() {
   const router = useRoutes([
@@ -88,6 +89,14 @@ function App() {
           element: (
             <Protected>
               <ContributionPage />
+            </Protected>
+          ),
+        },
+        {
+          path: "user",
+          element: (
+            <Protected>
+              <UserPage />
             </Protected>
           ),
         },

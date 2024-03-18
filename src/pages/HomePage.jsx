@@ -2,12 +2,25 @@ import { useEffect, useState } from "react";
 import Lightning from "/image/home/lightning.png";
 import FullLayout from "../components/layouts/Full";
 import { Badge, Button, Card, Col, Container, Row } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import facultyApi from "../api/facultyApi";
 import handleError from "../services/HandleErrors";
+import authService from "../services/AuthService";
 
 function HomePage() {
   const [faculties, setFaculties] = useState([]);
+
+  const isAuthenticated = () => {
+    return authService.isLogin();
+  };
+
+  const isStudent = () => {
+    return authService.getUserRole() === "Student";
+  };
+
+  if (isAuthenticated() && !isStudent()) {
+    return <Navigate to="/admin/dashboard" />;
+  }
 
   useEffect(() => {
     const fetchData = async () => {

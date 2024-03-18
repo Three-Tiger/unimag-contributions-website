@@ -6,6 +6,11 @@ class ContributionApi {
         return axiosClient.get(url);
     }
 
+    getById(contributionId) {
+        const url = `/api/contributions/${contributionId}`;
+        return axiosClient.get(url);
+    }
+
     getContributionsByAnnualMagazineIdAndUserId(annualMagazineId, userId) {
         const url = `/api/contributions/annual-magazine/${annualMagazineId}/user/${userId}`;
         return axiosClient.get(url);
