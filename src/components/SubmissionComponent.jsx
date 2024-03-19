@@ -18,11 +18,13 @@ const SubmissionComponent = ({ annualMagazine }) => {
   const [contribution, setContribution] = useState({});
   const [modelTitle, setModelTitle] = useState("Add new Contribution");
   const [show, setShow] = useState(false);
+  const [showChildModal, setShowChildModal] = useState(false);
   const [formContribution, setFormContribution] = useState({
     contributionId: "",
     title: "",
     fileDetails: [],
     imageDetails: [],
+    termAndCondition: false,
   });
   const [errorContribution, setErrorContribution] = useState({});
 
@@ -34,6 +36,7 @@ const SubmissionComponent = ({ annualMagazine }) => {
       title: "",
       fileDetails: [],
       imageDetails: [],
+      termAndCondition: false,
     });
   };
 
@@ -41,6 +44,9 @@ const SubmissionComponent = ({ annualMagazine }) => {
     setShow(true);
     setModelTitle("Add new Contribution");
   };
+
+  const handleCloseChildModal = () => setShowChildModal(false);
+  const handleOpenChildModal = () => setShowChildModal(true);
 
   const timeRemainingClosureDate = () => {
     if (!isClosed) {
@@ -83,6 +89,7 @@ const SubmissionComponent = ({ annualMagazine }) => {
     title: yup.string().required("Title is required"),
     imageDetails: yup.array().min(1, "Image is required"),
     fileDetails: yup.array().min(1, "File is required"),
+    termAndCondition: yup.boolean().oneOf([true], "You must accept the terms"),
   });
 
   const handleContributionChange = (event) => {
@@ -115,6 +122,13 @@ const SubmissionComponent = ({ annualMagazine }) => {
     });
   };
 
+  const handleCheckboxChange = (event) => {
+    setFormContribution({
+      ...formContribution,
+      termAndCondition: event.target.checked,
+    });
+  };
+
   const handeRemove = (id) => () => {
     swalService.confirmDelete(async () => {
       try {
@@ -131,6 +145,7 @@ const SubmissionComponent = ({ annualMagazine }) => {
     setFormContribution({
       contributionId: contribution.contributionId,
       title: contribution.title,
+      termAndCondition: true,
     });
     setShow(true);
   };
@@ -450,7 +465,11 @@ const SubmissionComponent = ({ annualMagazine }) => {
             keyboard={false}
             centered
           >
-            <form onSubmit={handleSubmit}>
+            <form
+              onSubmit={handleSubmit}
+              className="needs-validation"
+              noValidate
+            >
               <Modal.Header closeButton>
                 <Modal.Title>{modelTitle}</Modal.Title>
               </Modal.Header>
@@ -461,14 +480,16 @@ const SubmissionComponent = ({ annualMagazine }) => {
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${
+                      errorContribution.title ? "is-invalid" : ""
+                    }`}
                     id="contributionTitle"
                     name="title"
                     value={formContribution.title}
                     onChange={handleContributionChange}
                   />
                   <div className="invalid-feedback">
-                    {errorContribution.title ? errorContribution.title : ""}
+                    {errorContribution.title}
                   </div>
                 </div>
                 <div className="mb-3">
@@ -476,7 +497,9 @@ const SubmissionComponent = ({ annualMagazine }) => {
                     Choose your files
                   </label>
                   <input
-                    className="form-control"
+                    className={`form-control ${
+                      errorContribution.fileDetails ? "is-invalid" : ""
+                    }`}
                     type="file"
                     id="formFileMultiple"
                     multiple
@@ -484,9 +507,7 @@ const SubmissionComponent = ({ annualMagazine }) => {
                     onChange={handleFileChange}
                   />
                   <div className="invalid-feedback">
-                    {errorContribution.fileDetails
-                      ? errorContribution.fileDetails
-                      : ""}
+                    {errorContribution.fileDetails}
                   </div>
                 </div>
                 <div className="mb-3">
@@ -494,7 +515,9 @@ const SubmissionComponent = ({ annualMagazine }) => {
                     Choose your images
                   </label>
                   <input
-                    className="form-control"
+                    className={`form-control ${
+                      errorContribution.imageDetails ? "is-invalid" : ""
+                    }`}
                     type="file"
                     id="formImageMultiple"
                     multiple
@@ -502,11 +525,84 @@ const SubmissionComponent = ({ annualMagazine }) => {
                     onChange={handleImageChange}
                   />
                   <div className="invalid-feedback">
-                    {errorContribution.imageDetails
-                      ? errorContribution.imageDetails
-                      : ""}
+                    {errorContribution.imageDetails}
                   </div>
                 </div>
+                <div class="form-check">
+                  <input
+                    className={`form-check-input ${
+                      errorContribution.termAndCondition ? "is-invalid" : ""
+                    }`}
+                    type="checkbox"
+                    id="flexCheckDefault"
+                    name="termAndCondition"
+                    value=""
+                    onChange={handleCheckboxChange}
+                  />
+                  <label class="form-check-label" for="flexCheckDefault">
+                    I confirm that my article adheres to the submission
+                    guidelines provided by the website, including specifications
+                    on length, formatting, and content.{" "}
+                    <span>
+                      <a href="#" onClick={handleOpenChildModal}>
+                        Term and Condition
+                      </a>
+                    </span>
+                  </label>
+                  <div className="invalid-feedback">
+                    {errorContribution.termAndCondition}
+                  </div>
+                </div>
+                {/* Child Modal */}
+                <Modal
+                  show={showChildModal}
+                  onHide={handleCloseChildModal}
+                  backdrop="static"
+                  keyboard={false}
+                  centered
+                >
+                  <Modal.Header closeButton>
+                    <Modal.Title>Term and Condition</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <p>
+                      Submission Guidelines: By submitting an article, you agree
+                      to adhere to the submission guidelines provided by the
+                      website. These guidelines may include specifications
+                      regarding article length, formatting, citation style (if
+                      applicable), and content requirements.
+                    </p>
+                    <p>
+                      Originality of Content: You confirm that the article you
+                      are submitting is your original work and does not infringe
+                      upon the intellectual property rights of any third party.
+                      Plagiarism will not be tolerated, and any content found to
+                      be plagiarized will be rejected.
+                    </p>
+                    <p>
+                      Copyright Ownership: You acknowledge that by submitting an
+                      article, you retain the copyright to your work. However,
+                      you grant the website a non-exclusive license to publish,
+                      reproduce, distribute, and display your article on the
+                      website and its affiliated platforms.
+                    </p>
+                    <p>
+                      ccuracy and Legality: You certify that the information
+                      presented in your article is accurate to the best of your
+                      knowledge and does not violate
+                    </p>
+                    <p>
+                      ccuracy and Legality: You certify that the information
+                      presented in your article is accurate to the best of your
+                      knowledge and does not violate
+                    </p>
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button variant="warning" onClick={handleCloseChildModal}>
+                      Close
+                    </Button>
+                  </Modal.Footer>
+                </Modal>
               </Modal.Body>
               <Modal.Footer>
                 <Button variant="secondary" onClick={handleClose}>

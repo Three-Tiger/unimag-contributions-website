@@ -30,6 +30,11 @@ class ContributionApi {
         const url = `/api/contributions/${contributionId}`;
         return axiosClient.delete(url);
     }
+
+    getTop6() {
+        const url = "/api/contributions/top-6";
+        return axiosClient.get(url);
+    }
 }
 
 const contributionApi = new ContributionApi();
