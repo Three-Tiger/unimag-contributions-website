@@ -6,8 +6,11 @@ import { Link, Navigate } from "react-router-dom";
 import facultyApi from "../api/facultyApi";
 import handleError from "../services/HandleErrors";
 import authService from "../services/AuthService";
+import contributionApi from "../api/contributionApi";
+import formatDateTime from "../services/FormatDateTime";
 
 function HomePage() {
+  const [top6Contributions, setTop6Contributions] = useState([]);
   const [faculties, setFaculties] = useState([]);
 
   const isAuthenticated = () => {
@@ -27,6 +30,9 @@ function HomePage() {
       try {
         const response = await facultyApi.getAll();
         setFaculties(response);
+        const top6Contributions = await contributionApi.getTop6();
+        setTop6Contributions(top6Contributions);
+        console.log("🚀 ~ fetchData ~ top6Contributions:", top6Contributions);
       } catch (error) {
         handleError.showError(error);
       }
@@ -34,63 +40,6 @@ function HomePage() {
 
     fetchData();
   }, []);
-
-  const studentArticles = [
-    {
-      id: 1,
-      thumbnail: "image/home/article1.png",
-      submissionDate: "2024-09-01",
-      author: "John Doe",
-      title: "The Future of Technology",
-      description:
-        "Some quick example text to build on the card title and make up the bulk of the card's content.",
-    },
-    {
-      id: 2,
-      thumbnail: "image/home/article2.png",
-      submissionDate: "2024-09-05",
-      author: "Jane Smith",
-      title: "Exploring Artificial Intelligence",
-      description:
-        "An in-depth analysis of the current state and potential future of artificial intelligence.",
-    },
-    {
-      id: 3,
-      thumbnail: "image/home/article3.png",
-      submissionDate: "2024-09-10",
-      author: "Alice Johnson",
-      title: "The Impact of Climate Change on Global Economy",
-      description:
-        "Examining the economic consequences of climate change and possible solutions.",
-    },
-    {
-      id: 4,
-      thumbnail: "image/home/article4.png",
-      submissionDate: "2024-09-15",
-      author: "Bob Williams",
-      title: "Space Exploration: Past, Present, and Future",
-      description:
-        "A comprehensive overview of humanity's journey into space and what lies ahead. Examining the economic consequences of climate change and possible solutions.",
-    },
-    {
-      id: 5,
-      thumbnail: "image/home/article5.png",
-      submissionDate: "2024-09-20",
-      author: "Eva Brown",
-      title: "The Role of Blockchain in Modern Finance",
-      description:
-        "Analyzing the applications and potential disruptions of blockchain technology in the financial sector.",
-    },
-    {
-      id: 6,
-      thumbnail: "image/home/article6.png",
-      submissionDate: "2024-09-25",
-      author: "Michael Johnson",
-      title: "Understanding Quantum Computing",
-      description:
-        "An exploration of the principles and implications of quantum computing. Analyzing the applications and potential disruptions of blockchain technology in the financial sector.",
-    },
-  ];
 
   return (
     <>
@@ -113,9 +62,11 @@ function HomePage() {
                 talents of its students.
               </p>
               <div className="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
-                <Button variant="warning" size="lg" className="px-4 gap-3">
-                  Submit
-                </Button>
+                <Link to="/submission">
+                  <Button variant="warning" size="lg" className="px-4 gap-3">
+                    Submit
+                  </Button>
+                </Link>
                 <Button variant="outline-warning" size="lg" className="px-4">
                   Learn More
                 </Button>
@@ -194,30 +145,43 @@ function HomePage() {
             </Row>
 
             <Row>
-              {studentArticles.map((article, index) => (
+              {top6Contributions.map((contribution, index) => (
                 <Col md={6} key={index}>
                   <Card className="mb-4">
-                    <Card.Img variant="top" src={article.thumbnail} />
+                    <Card.Img
+                      variant="top"
+                      src={`/api/contributions/${contribution.contributionId}/image`}
+                      style={{
+                        height: "300px",
+                        objectFit: "cover",
+                        objectPosition: "center",
+                      }}
+                    />
                     <Card.Body>
                       <Card.Text>
                         <div className="d-flex justify-content-between align-items-center">
                           <Badge bg="light" text="dark">
-                            <p className="p-2 mb-0">{article.submissionDate}</p>
+                            <p className="p-2 mb-0">
+                              {formatDateTime.toDateString(
+                                contribution.submissionDate
+                              )}
+                            </p>
                           </Badge>
                           <h6 className="mb-0">
                             By{" "}
                             <span className="text-warning">
-                              {article.author}
+                              {contribution.user.firstName}{" "}
+                              {contribution.user.lastName}
                             </span>
                           </h6>
                         </div>
                       </Card.Text>
                       <Card.Title className="mb-2">
-                        <h5 className="fw-bold">{article.title}</h5>
+                        <h5 className="fw-bold">{contribution.title}</h5>
                       </Card.Title>
-                      <Card.Text>
+                      {/* <Card.Text>
                         <p className="description">{article.description}</p>
-                      </Card.Text>
+                      </Card.Text> */}
                       <div className="text-end">
                         <Button variant="outline-warning">
                           <i className="bi bi-arrow-up-right"></i>
