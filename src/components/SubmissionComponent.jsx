@@ -10,6 +10,7 @@ import imageDetailApi from "../api/imageDetailApi";
 import swalService from "../services/SwalService";
 import TextToHtmlConverter from "./TextToHtmlConverter";
 import emailApi from "../api/emailApi";
+import feedbackApi from "../api/feedbackApi";
 
 const SubmissionComponent = ({ annualMagazine }) => {
   const isClosed = new Date(annualMagazine.closureDate) < new Date();
@@ -27,6 +28,7 @@ const SubmissionComponent = ({ annualMagazine }) => {
     termAndCondition: false,
   });
   const [errorContribution, setErrorContribution] = useState({});
+  const [userData, setUserData] = useState(null);
 
   const handleClose = () => {
     setShow(false);
@@ -148,6 +150,28 @@ const SubmissionComponent = ({ annualMagazine }) => {
       termAndCondition: true,
     });
     setShow(true);
+  };
+
+  const handleSendFeedback = async (event) => {
+    event.preventDefault();
+    const content = event.target[0].value;
+    if (!content) {
+      return;
+    }
+    const feedbackData = {
+      content: content,
+      feedbackDate: new Date(),
+      userId: userData.userId,
+      contributionId: contribution.contributionId,
+    };
+
+    const response = await feedbackApi.save(feedbackData);
+
+    const newContribution = { ...contribution };
+    newContribution.feedbacks.push(response);
+    setContribution(newContribution);
+
+    event.target[0].value = "";
   };
 
   // Form
@@ -303,6 +327,7 @@ const SubmissionComponent = ({ annualMagazine }) => {
     const fetchData = async () => {
       try {
         const user = authService.getUserData();
+        setUserData(user);
         const response =
           await contributionApi.getContributionsByAnnualMagazineIdAndUserId(
             annualMagazine.annualMagazineId,
@@ -645,16 +670,6 @@ const SubmissionComponent = ({ annualMagazine }) => {
                     <td className="fw-bold col-3">Feedback by</td>
                     <td>
                       <div className="d-flex gap-2">
-                        <img
-                          src={
-                            contribution.feedbacks[0].user.profilePicture
-                              ? `/api/users/${contribution.feedbacks[0].user.userId}/image`
-                              : "/image/default-avatar.png"
-                          }
-                          width={25}
-                          height={25}
-                          roundedCircle
-                        />
                         <p className="mb-0">
                           {contribution.feedbacks[0].user.firstName}{" "}
                           {contribution.feedbacks[0].user.lastName}
@@ -665,10 +680,53 @@ const SubmissionComponent = ({ annualMagazine }) => {
                   <tr>
                     <td className="fw-bold col-3">Feedback comment</td>
                     <td>
-                      {/* <TextToHtmlConverter
-                        text={contribution.feedbacks[0].content}
-                      /> */}
-                      <pre>{contribution.feedbacks[0].content}</pre>
+                      <div class="container">
+                        {contribution.feedbacks.map((feedback, index) => (
+                          <div class="chat-box" key={index}>
+                            <div
+                              class={
+                                feedback.user.userId == userData.userId
+                                  ? "user-message"
+                                  : "other-message"
+                              }
+                            >
+                              {feedback.user?.userId == userData.userId && (
+                                <div class="message">
+                                  <pre>{feedback.content}</pre>
+                                </div>
+                              )}
+                              <img
+                                src={
+                                  feedback.user?.profilePicture
+                                    ? `/api/users/${feedback.user?.userId}/image`
+                                    : "/image/default-avatar.png"
+                                }
+                                alt="Avatar"
+                                class="avatar"
+                              />
+                              {feedback.user?.userId != userData.userId && (
+                                <div class="message">
+                                  <pre>{feedback.content}</pre>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                        <form onSubmit={handleSendFeedback}>
+                          <div class="input-group message-input">
+                            <textarea
+                              class="form-control"
+                              placeholder="Type your message..."
+                              rows={3}
+                            />
+                            <div className="ms-2">
+                              <button class="btn btn-warning" type="submit">
+                                Send
+                              </button>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
