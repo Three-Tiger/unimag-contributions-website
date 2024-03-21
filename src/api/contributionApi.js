@@ -16,6 +16,11 @@ class ContributionApi {
         return axiosClient.get(url);
     }
 
+    getContributionsByUserId(userId) {
+        const url = `/api/contributions/user/${userId}`;
+        return axiosClient.get(url);
+    }
+
     save(contributionData) {
         const url = "/api/contributions";
         return axiosClient.post(url, contributionData);
@@ -31,9 +36,10 @@ class ContributionApi {
         return axiosClient.delete(url);
     }
 
-    getTop6() {
-        const url = "/api/contributions/top-6";
-        return axiosClient.get(url);
+    getPublished(limit) {
+        const url = "/api/contributions/published";
+        if (limit === undefined) return axiosClient.get(url);
+        return axiosClient.get(url, { params: { limit } });
     }
 }
 

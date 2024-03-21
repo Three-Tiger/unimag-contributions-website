@@ -190,6 +190,7 @@ const SubmissionComponent = ({ annualMagazine }) => {
             title: formContribution.title,
             submissionDate: new Date(),
             status: contribution.status,
+            isPublished: false,
             userId: authService.getUserData().userId,
             annualMagazineId: annualMagazine.annualMagazineId,
           };
@@ -299,6 +300,7 @@ const SubmissionComponent = ({ annualMagazine }) => {
           };
           await emailApi.sendMailAsync(email);
         } catch (error) {
+          console.log("🚀 ~ handleSubmit ~ error:", error);
           handleError.showError(error);
         } finally {
           setIsLoading(false);
@@ -527,6 +529,7 @@ const SubmissionComponent = ({ annualMagazine }) => {
                     }`}
                     type="file"
                     id="formFileMultiple"
+                    accept=".docx"
                     multiple
                     name="fileDetails"
                     onChange={handleFileChange}
@@ -545,6 +548,7 @@ const SubmissionComponent = ({ annualMagazine }) => {
                     }`}
                     type="file"
                     id="formImageMultiple"
+                    accept=".jpg, .jpeg, .png"
                     multiple
                     name="imageDetails"
                     onChange={handleImageChange}

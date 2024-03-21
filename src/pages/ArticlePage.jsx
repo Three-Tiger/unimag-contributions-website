@@ -1,9 +1,51 @@
-import React from "react";
-import { Button, Card, Col, Container, Row, Form } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import {
+  Button,
+  Card,
+  Col,
+  Container,
+  Row,
+  Form,
+  Badge,
+} from "react-bootstrap";
 import { Link } from "react-router-dom";
 import FullLayout from "../components/layouts/Full";
+import contributionApi from "../api/contributionApi";
+import handleError from "../services/HandleErrors";
+import formatDateTime from "../services/FormatDateTime";
+import fileDetailApi from "../api/fileDetailApi";
 
-const Submition = () => {
+const ArticlePage = () => {
+  const [contributionsPublished, setContributionsPublished] = useState([]);
+
+  const downloadArticle = (contributionId, title) => async () => {
+    try {
+      const response = await fileDetailApi.downloadMultipleFile(contributionId);
+      const url = window.URL.createObjectURL(new Blob([response]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", title + ".zip");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      handleError.showError(error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const getPublished = await contributionApi.getPublished();
+        setContributionsPublished(getPublished);
+      } catch (error) {
+        handleError.showError(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <FullLayout>
       <Container>
@@ -20,29 +62,64 @@ const Submition = () => {
         </Row>
 
         <Row>
-          <Col md={12}>
-            <Card className="mb-4">
-              <Card.Body>
-                <div className="d-flex justify-content-between align-items-center mt-4">
-                  <Form style={{ width: "100%", height: "100%" }}>
-                    <Form.Group className="mb-3 mt-4" controlId="#">
-                      <Form.Label>File Upload</Form.Label>
-                      <Form.Control placeholder="File status" />
-                    </Form.Group>
-                    <div className="d-flex justify-content-center mt-4">
-                      <Button variant="outline-warning" className="me-4">
-                        Back
-                      </Button>
+          {contributionsPublished.map((contribution, index) => (
+            <Col md={6} key={index}>
+              <Card className="mb-4">
+                <Card.Img
+                  variant="top"
+                  src={`/api/contributions/${contribution.contributionId}/image`}
+                  style={{
+                    height: "300px",
+                    objectFit: "cover",
+                    objectPosition: "center",
+                  }}
+                />
+                <Card.Body>
+                  <Card.Text>
+                    <div className="d-flex justify-content-between align-items-center">
+                      <Badge bg="light" text="dark">
+                        <p className="p-2 mb-0">
+                          {formatDateTime.toDateString(
+                            contribution.submissionDate
+                          )}
+                        </p>
+                      </Badge>
+                      <h6 className="mb-0">
+                        By{" "}
+                        <span className="text-warning">
+                          {contribution.user.firstName}{" "}
+                          {contribution.user.lastName}
+                        </span>
+                      </h6>
                     </div>
-                  </Form>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>{" "}
+                  </Card.Text>
+                  <Card.Title className="mb-2">
+                    <h5 className="fw-bold">{contribution.title}</h5>
+                  </Card.Title>
+                  <div className="text-end">
+                    {/* <Link to={`/article/${contribution.contributionId}`}>
+                      <Button variant="outline-warning" >
+                        <i className="bi bi-arrow-up-right"></i>
+                      </Button>
+                    </Link> */}
+                    <Button
+                      variant="outline-warning"
+                      onClick={downloadArticle(
+                        contribution.contributionId,
+                        contribution.title
+                      )}
+                    >
+                      <i className="bi bi-download"></i>
+                    </Button>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
         </Row>
       </Container>
     </FullLayout>
   );
 };
 
-export default Submition;
+export default ArticlePage;

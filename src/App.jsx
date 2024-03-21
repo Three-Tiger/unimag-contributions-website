@@ -16,6 +16,8 @@ import ProfilePage from "./pages/ProfilePage.jsx";
 import UserPage from "./pages/UserPage.jsx";
 import AdminProtected from "./components/layouts/AdminProtected.jsx";
 import StudentProtected from "./components/layouts/StudentProtected.jsx";
+import ArticleDetailPage from "./pages/ArticleDetailPage.jsx";
+import MyContributionPage from "./pages/MyContribution.jsx";
 
 function App() {
   const router = useRoutes([
@@ -68,10 +70,18 @@ function App() {
       ),
     },
     {
+      path: "/article/:id",
+      element: (
+        <Protected>
+          <ArticleDetailPage />
+        </Protected>
+      ),
+    },
+    {
       path: "/my-contribution",
       element: (
         <StudentProtected>
-          <ContributionPage />
+          <MyContributionPage />
         </StudentProtected>
       ),
     },
