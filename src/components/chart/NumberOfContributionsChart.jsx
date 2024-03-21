@@ -86,7 +86,7 @@ const NumberOfContributionsChart = () => {
         options={state.options}
         series={state.series}
         type="bar"
-        height={430}
+        height={500}
       />
     </div>
   );

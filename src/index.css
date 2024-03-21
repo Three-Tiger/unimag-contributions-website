@@ -109,3 +109,10 @@ pre {
   border-radius: 10px;
   clear: both;
 }
+.position-relative {
+  position: relative;
+}
+
+.abt-img {
+  size: 30%;
+}

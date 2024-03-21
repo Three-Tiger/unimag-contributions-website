@@ -57,7 +57,7 @@ const NumberOfAccountBarChart = () => {
         options={state.options}
         series={state.series}
         type="bar"
-        height={245}
+        height={200}
       />
     </div>
   );

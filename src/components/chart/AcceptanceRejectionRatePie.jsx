@@ -55,7 +55,7 @@ const AcceptanceRejectionRatePie = () => {
         options={state.options}
         series={state.series}
         type="pie"
-        width={400}
+        width={355}
       />
     </div>
   );
