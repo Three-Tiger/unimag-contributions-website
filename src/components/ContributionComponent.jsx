@@ -350,12 +350,12 @@ const ContributionComponent = ({ annualMagazine }) => {
                         </div>
                       </td>
                     </tr>
-                    <tr>
+                    {/* <tr>
                       <td className="fw-bold col-3">Feedback comment</td>
                       <td className="col-9">
                         <pre>{contribution.feedbacks[0].content}</pre>
                       </td>
-                    </tr>
+                    </tr> */}
                   </tbody>
                 </Table>
               )}
@@ -536,12 +536,18 @@ const ContributionComponent = ({ annualMagazine }) => {
                   </td>
                   <td>{contribution.user.faculty.name}</td>
                   <td>
-                    <Button
-                      variant="outline-warning"
-                      onClick={handleGiveFeedback(contribution.contributionId)}
-                    >
-                      View
-                    </Button>
+                    <div className="d-flex flex-wrap gap-2">
+                      <Button
+                        variant="outline-warning"
+                        onClick={handleGiveFeedback(
+                          contribution.contributionId
+                        )}
+                      >
+                        View
+                      </Button>
+                      <Button variant="outline-success">Publish</Button>
+                      <Button variant="outline-danger">Unreleased</Button>
+                    </div>
                   </td>
                 </tr>
               ))}

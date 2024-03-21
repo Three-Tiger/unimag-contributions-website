@@ -1,9 +1,4 @@
-import {
-  Route,
-  RouterProvider,
-  createBrowserRouter,
-  useRoutes,
-} from "react-router-dom";
+import { useRoutes } from "react-router-dom";
 import "./App.css";
 import LoginPage from "./pages/LoginPage.jsx";
 import FacultyPage from "./pages/FacultyPage.jsx";

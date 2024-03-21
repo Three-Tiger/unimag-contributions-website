@@ -20,6 +20,11 @@ class StatisticApi {
         const url = '/api/statistics/percentage-of-contributions';
         return axiosClient.get(url);
     }
+
+    getRecentContribution() {
+        const url = "/api/contributions/top-6";
+        return axiosClient.get(url);
+    }
 }
 
 const statisticApi = new StatisticApi();
