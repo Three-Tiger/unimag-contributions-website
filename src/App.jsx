@@ -11,6 +11,7 @@ import DashboardPage from "./pages/DashboardPage.jsx";
 import AnnualMagazinePage from "./pages/AnnualMagazine.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import AllFacultyPage from "./pages/AllFaculty.jsx";
+import AboutPage from "./pages/AboutPage.jsx";
 import SubmissionPage from "./pages/SubmissionPage.jsx";
 import ArticlePage from "./pages/ArticlePage.jsx";
 import ContributionPage from "./pages/ContributionPage.jsx";
@@ -44,6 +45,10 @@ function App() {
     {
       path: "/faculty",
       element: <AllFacultyPage />,
+    },
+    {
+      path: "/about",
+      element: <AboutPage />,
     },
     {
       path: "/submission",
