@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import contributionApi from "../api/contributionApi";
 import handleError from "../services/HandleErrors";
 import { Badge, Button, Modal, Table } from "react-bootstrap";
 import formatDateTime from "../services/FormatDateTime";
-import * as yup from "yup";
 import feedbackApi from "../api/feedbackApi";
-import swalService from "../services/SwalService";
 import authService from "../services/AuthService";
 import fileDetailApi from "../api/fileDetailApi";
+import swalService from "../services/SwalService";
 
 const ContributionComponent = ({ annualMagazine }) => {
   const isClosed = new Date(annualMagazine.closureDate) < new Date();
@@ -30,11 +29,11 @@ const ContributionComponent = ({ annualMagazine }) => {
     status: "",
     content: "",
   });
-  const [error, setError] = useState({});
+  const [userData, setUserData] = useState(null);
+  const bottomOfChatRef = useRef(null);
 
   const handleClose = () => {
     setShow(false);
-    setError({});
     setFormData({
       status: "",
       content: "",
@@ -43,22 +42,16 @@ const ContributionComponent = ({ annualMagazine }) => {
 
   const handleShow = () => {
     setShow(true);
+    scrollToBottom();
   };
 
   const handleGiveFeedback = (id) => async () => {
     const response = await contributionApi.getById(id);
-    console.log("🚀 ~ handleGiveFeedback ~ response:", response);
+    setContribution(response);
     setFormData({
       status: response.status,
-      ...response,
+      content: "",
     });
-    setContribution(response);
-    if (response.feedbacks?.length > 0) {
-      setFormData({
-        ...response,
-        content: response.feedbacks[0].content,
-      });
-    }
     handleShow();
   };
 
@@ -105,12 +98,6 @@ const ContributionComponent = ({ annualMagazine }) => {
     link.parentNode.removeChild(link);
   };
 
-  // Yup validation
-  const schema = yup.object().shape({
-    status: yup.string().required("Status is required"),
-    content: yup.string().required("Content is required"),
-  });
-
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData({
@@ -119,11 +106,17 @@ const ContributionComponent = ({ annualMagazine }) => {
     });
   };
 
+  // Function to scroll the chat container to the bottom
+  const scrollToBottom = () => {
+    if (bottomOfChatRef.current) {
+      bottomOfChatRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    try {
-      await schema.validate(formData, { abortEarly: false });
 
+    if (contribution.status != formData.status) {
       const contributionData = {
         contributionId: contribution.contributionId,
         title: contribution.title,
@@ -135,30 +128,10 @@ const ContributionComponent = ({ annualMagazine }) => {
       // Update contribution
       await contributionApi.update(contributionData);
 
-      const currentUser = authService.getUserData();
-      if (contribution.feedbacks.length == 0) {
-        // Add feedback
-        const feedbackData = {
-          content: formData.content,
-          feedbackDate: new Date(),
-          userId: currentUser.userId,
-          contributionId: contribution.contributionId,
-        };
+      // Update status in the state
+      setContribution({ ...contribution, status: formData.status });
 
-        await feedbackApi.save(feedbackData);
-      } else {
-        // Update feedback
-        const feedbackData = {
-          feedBackId: contribution.feedbacks[0].feedBackId,
-          content: formData.content,
-          feedbackDate: new Date(),
-          userId: currentUser.userId,
-          contributionId: contribution.contributionId,
-        };
-
-        await feedbackApi.update(feedbackData);
-      }
-
+      // Update status in the contributions state
       setContributions((previousState) => {
         return previousState.map((c) => {
           if (c.contributionId === contribution.contributionId) {
@@ -171,15 +144,30 @@ const ContributionComponent = ({ annualMagazine }) => {
         });
       });
 
-      swalService.showMessage("Success", "Feedback has been saved", "success");
+      swalService.showMessage(
+        "Success",
+        `You have set the status to ${formData.status}`,
+        "success"
+      );
+    }
 
-      handleClose();
-    } catch (error) {
-      const newError = {};
-      error.inner.forEach((e) => {
-        newError[e.path] = e.message;
-      });
-      setError(newError);
+    if (formData.content) {
+      const feedbackData = {
+        content: formData.content,
+        feedbackDate: new Date(),
+        userId: userData.userId,
+        contributionId: contribution.contributionId,
+      };
+
+      const response = await feedbackApi.save(feedbackData);
+
+      const newContribution = { ...contribution };
+      newContribution.feedbacks.push(response);
+      setContribution(newContribution);
+
+      // Clear content
+      setFormData({ ...formData, content: "" });
+      document.querySelector(".message-input textarea").value = "";
     }
   };
 
@@ -191,6 +179,8 @@ const ContributionComponent = ({ annualMagazine }) => {
             annualMagazine.annualMagazineId
           );
         setContributions(response);
+        const user = authService.getUserData();
+        setUserData(user);
       } catch (error) {
         handleError.showError(error);
       }
@@ -209,258 +199,283 @@ const ContributionComponent = ({ annualMagazine }) => {
         keyboard={false}
         centered
       >
-        <form onSubmit={handleSubmit}>
-          <Modal.Header closeButton>
-            <Modal.Title>Give feedback</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <table className="table table-striped">
-              <tbody>
-                <tr>
-                  <td className="fw-bold col-3">Grading status</td>
-                  <td>
-                    {isGraded() ? (
-                      <p className="text-success fw-bold mb-0">Graded</p>
-                    ) : (
-                      <p className="text-danger fw-bold mb-0">Not graded</p>
-                    )}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="fw-bold col-3">Closure Date</td>
-                  <td>
-                    {formatDateTime.toDateTimeString(
-                      annualMagazine.closureDate
-                    )}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="fw-bold col-3">Final Closure Date</td>
-                  <td>
-                    {formatDateTime.toDateTimeString(
-                      annualMagazine.finalClosureDate
-                    )}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="fw-bold col-3">Time remaining</td>
-                  <td>
-                    <div>
-                      <span className="fw-bold">Closure Date</span>:{" "}
-                      {timeRemainingClosureDate()}
-                    </div>
-                    <div>
-                      <span className="fw-bold">Final Closure Date</span>:{" "}
-                      {timeRemainingFinalClosureDate()}
-                    </div>
-                  </td>
-                </tr>
-                {Object.keys(contribution).length > 0 && (
-                  <>
-                    <tr>
-                      <td className="fw-bold col-3">Title</td>
-                      <td>{contribution.title}</td>
-                    </tr>
-                    <tr>
-                      <td className="fw-bold col-3">File submissions</td>
-                      <td>
-                        {contribution.fileDetails.map((file, index) => (
-                          <div
-                            className="d-flex align-items-center gap-2 mb-3"
-                            key={index}
-                          >
-                            <h2 className="mb-0">
-                              {file.fileType == "DOCX" ? (
-                                <i className="bi bi-filetype-docx"></i>
-                              ) : (
-                                <i className="bi bi-filetype-pdf"></i>
-                              )}
-                            </h2>
+        <Modal.Header closeButton>
+          <Modal.Title>Give feedback</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <table className="table table-striped">
+            <tbody>
+              <tr>
+                <td className="fw-bold col-3">Grading status</td>
+                <td>
+                  {isGraded() ? (
+                    <p className="text-success fw-bold mb-0">Graded</p>
+                  ) : (
+                    <p className="text-danger fw-bold mb-0">Not graded</p>
+                  )}
+                </td>
+              </tr>
+              <tr>
+                <td className="fw-bold col-3">Closure Date</td>
+                <td>
+                  {formatDateTime.toDateTimeString(annualMagazine.closureDate)}
+                </td>
+              </tr>
+              <tr>
+                <td className="fw-bold col-3">Final Closure Date</td>
+                <td>
+                  {formatDateTime.toDateTimeString(
+                    annualMagazine.finalClosureDate
+                  )}
+                </td>
+              </tr>
+              <tr>
+                <td className="fw-bold col-3">Time remaining</td>
+                <td>
+                  <div>
+                    <span className="fw-bold">Closure Date</span>:{" "}
+                    {timeRemainingClosureDate()}
+                  </div>
+                  <div>
+                    <span className="fw-bold">Final Closure Date</span>:{" "}
+                    {timeRemainingFinalClosureDate()}
+                  </div>
+                </td>
+              </tr>
+              {Object.keys(contribution).length > 0 && (
+                <>
+                  <tr>
+                    <td className="fw-bold col-3">Title</td>
+                    <td>{contribution.title}</td>
+                  </tr>
+                  <tr>
+                    <td className="fw-bold col-3">File submissions</td>
+                    <td>
+                      {contribution.fileDetails.map((file, index) => (
+                        <div
+                          className="d-flex align-items-center gap-2 mb-3"
+                          key={index}
+                        >
+                          <h2 className="mb-0">
+                            {file.fileType == "DOCX" ? (
+                              <i className="bi bi-filetype-docx"></i>
+                            ) : (
+                              <i className="bi bi-filetype-pdf"></i>
+                            )}
+                          </h2>
+                          <div>
+                            <a
+                              href={`/api/file-details/${file.fileId}/download`}
+                              key={index}
+                            >
+                              {file.fileName}
+                            </a>
                             <div>
-                              <a
-                                href={`/api/file-details/${file.fileId}/download`}
-                                key={index}
-                              >
-                                {file.fileName}
-                              </a>
-                              <div>
-                                {formatDateTime.toDateTimeString(
-                                  contribution.submissionDate
-                                )}
-                              </div>
+                              {formatDateTime.toDateTimeString(
+                                contribution.submissionDate
+                              )}
                             </div>
                           </div>
+                        </div>
+                      ))}
+                      <a
+                        href={`/api/file-details/${contribution.contributionId}/download-multiple`}
+                        className="btn btn-outline-warning"
+                      >
+                        Download all
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="fw-bold col-3">Image submissions</td>
+                    <td>
+                      <div className="d-flex flex-wrap align-items-center gap-2">
+                        {contribution.imageDetails.map((image, index) => (
+                          <img
+                            src={`/api/image-details/${image.imageId}`}
+                            alt={image.imageName}
+                            key={index}
+                            className="img-thumbnail w-25 h-25"
+                          />
                         ))}
-                        <a
-                          href={`/api/file-details/${contribution.contributionId}/download-multiple`}
-                          className="btn btn-outline-warning"
-                        >
-                          Download all
-                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                </>
+              )}
+            </tbody>
+          </table>
+          <div className="my-5 py-5"></div>
+          {isManager() ? (
+            <div>
+              {contribution.feedbacks?.length > 0 && (
+                <Table striped>
+                  <tbody>
+                    <tr>
+                      <td className="fw-bold col-3">Status</td>
+                      <td>
+                        {contribution.status == "Approved" ? (
+                          <Badge bg="success">{contribution.status}</Badge>
+                        ) : (
+                          <Badge bg="danger">{contribution.status}</Badge>
+                        )}
                       </td>
                     </tr>
                     <tr>
-                      <td className="fw-bold col-3">Image submissions</td>
+                      <td className="fw-bold col-3">Feedback on</td>
                       <td>
-                        <div className="d-flex flex-wrap align-items-center gap-2">
-                          {contribution.imageDetails.map((image, index) => (
-                            <img
-                              src={`/api/image-details/${image.imageId}`}
-                              alt={image.imageName}
-                              key={index}
-                              className="img-thumbnail w-25 h-25"
-                            />
-                          ))}
+                        {formatDateTime.toDateTimeString(
+                          contribution.feedbacks[0].feedbackDate
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="fw-bold col-3">Feedback by</td>
+                      <td>
+                        <div className="d-flex gap-2">
+                          <img
+                            src={
+                              contribution.feedbacks[0].user.profilePicture
+                                ? `/api/users/${contribution.feedbacks[0].user.userId}/image`
+                                : "/image/default-avatar.png"
+                            }
+                            width={25}
+                            height={25}
+                            roundedCircle
+                          />
+                          <p className="mb-0">
+                            {contribution.feedbacks[0].user.firstName}{" "}
+                            {contribution.feedbacks[0].user.lastName}
+                          </p>
                         </div>
                       </td>
                     </tr>
-                  </>
-                )}
-              </tbody>
-            </table>
-            <div className="my-5 py-5"></div>
-            {isManager() ? (
-              <div>
-                {contribution.feedbacks?.length > 0 && (
-                  <Table striped>
-                    <tbody>
-                      <tr>
-                        <td className="fw-bold col-3">Status</td>
-                        <td>
-                          {contribution.status == "Approved" ? (
-                            <Badge bg="success">{contribution.status}</Badge>
-                          ) : (
-                            <Badge bg="danger">{contribution.status}</Badge>
-                          )}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="fw-bold col-3">Feedback on</td>
-                        <td>
-                          {formatDateTime.toDateTimeString(
-                            contribution.feedbacks[0].feedbackDate
-                          )}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="fw-bold col-3">Feedback by</td>
-                        <td>
-                          <div className="d-flex gap-2">
-                            <img
-                              src={
-                                contribution.feedbacks[0].user.profilePicture
-                                  ? `/api/users/${contribution.feedbacks[0].user.userId}/image`
-                                  : "/image/default-avatar.png"
-                              }
-                              width={25}
-                              height={25}
-                              roundedCircle
-                            />
-                            <p className="mb-0">
-                              {contribution.feedbacks[0].user.firstName}{" "}
-                              {contribution.feedbacks[0].user.lastName}
-                            </p>
+                    {/* <tr>
+                      <td className="fw-bold col-3">Feedback comment</td>
+                      <td className="col-9">
+                        <pre>{contribution.feedbacks[0].content}</pre>
+                      </td>
+                    </tr> */}
+                  </tbody>
+                </Table>
+              )}
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <div className="message-list">
+                {Object.keys(contribution).length > 0 &&
+                  contribution.feedbacks.map((feedback, index) => (
+                    <div className="chat-box" key={index}>
+                      <div
+                        className={
+                          feedback.user.userId == userData.userId
+                            ? "user-message"
+                            : "other-message"
+                        }
+                      >
+                        {feedback.user?.userId == userData.userId && (
+                          <div className="message">
+                            <pre>{feedback.content}</pre>
                           </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="fw-bold col-3">Feedback comment</td>
-                        <td className="col-9">
-                          <pre>{contribution.feedbacks[0].content}</pre>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </Table>
-                )}
+                        )}
+                        <img
+                          src={
+                            feedback.user?.profilePicture
+                              ? `/api/users/${feedback.user?.userId}/image`
+                              : "/image/default-avatar.png"
+                          }
+                          alt="Avatar"
+                          className="avatar"
+                        />
+                        {feedback.user?.userId != userData.userId && (
+                          <div className="message">
+                            <pre>{feedback.content}</pre>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                <div ref={bottomOfChatRef}></div>
               </div>
-            ) : (
-              <div>
-                <div className="mb-3">
-                  <label htmlFor="facultyName" className="form-label">
-                    Your decision (choose one option)
-                  </label>
-                  <div>
-                    <input
-                      type="radio"
-                      className="btn-check"
-                      name="status"
-                      id="warning-outlined"
-                      value="Waiting"
-                      autocomplete="off"
-                      checked={formData.status === "Waiting"}
-                      onChange={handleChange}
-                    />
-                    <label
-                      className="btn btn-outline-warning me-2"
-                      htmlFor="warning-outlined"
-                    >
-                      Waiting
-                    </label>
-
-                    <input
-                      type="radio"
-                      className="btn-check"
-                      name="status"
-                      id="success-outlined"
-                      value="Approved"
-                      autocomplete="off"
-                      checked={formData.status === "Approved"}
-                      onChange={handleChange}
-                    />
-                    <label
-                      className="btn btn-outline-success me-2"
-                      htmlFor="success-outlined"
-                    >
-                      Approve
-                    </label>
-
-                    <input
-                      type="radio"
-                      className="btn-check"
-                      name="status"
-                      id="danger-outlined"
-                      value="Rejected"
-                      autocomplete="off"
-                      checked={formData.status === "Rejected"}
-                      onChange={handleChange}
-                    />
-                    <label
-                      className="btn btn-outline-danger"
-                      htmlFor="danger-outlined"
-                    >
-                      Reject
-                    </label>
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="feedbackContent" className="form-label">
-                    Your feedback
-                  </label>
-                  <textarea
-                    type="text"
-                    className="form-control"
-                    id="feedbackContent"
-                    name="content"
-                    rows={10}
-                    value={formData.content}
+              <div className="mb-3">
+                <label htmlFor="facultyName" className="form-label">
+                  Your decision (choose one option)
+                </label>
+                <div>
+                  <input
+                    type="radio"
+                    className="btn-check"
+                    name="status"
+                    id="warning-outlined"
+                    value="Waiting"
+                    autoComplete="off"
+                    checked={formData.status === "Waiting"}
                     onChange={handleChange}
                   />
-                  <div className="invalid-feedback">
-                    {error.content ? error.content : ""}
-                  </div>
+                  <label
+                    className="btn btn-outline-warning me-2"
+                    htmlFor="warning-outlined"
+                  >
+                    Waiting
+                  </label>
+
+                  <input
+                    type="radio"
+                    className="btn-check"
+                    name="status"
+                    id="success-outlined"
+                    value="Approved"
+                    autoComplete="off"
+                    checked={formData.status === "Approved"}
+                    onChange={handleChange}
+                  />
+                  <label
+                    className="btn btn-outline-success me-2"
+                    htmlFor="success-outlined"
+                  >
+                    Approve
+                  </label>
+
+                  <input
+                    type="radio"
+                    className="btn-check"
+                    name="status"
+                    id="danger-outlined"
+                    value="Rejected"
+                    autoComplete="off"
+                    checked={formData.status === "Rejected"}
+                    onChange={handleChange}
+                  />
+                  <label
+                    className="btn btn-outline-danger"
+                    htmlFor="danger-outlined"
+                  >
+                    Reject
+                  </label>
                 </div>
               </div>
-            )}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleClose}>
-              Close
-            </Button>
-            <Button variant="warning" type="submit">
-              Submit
-            </Button>
-          </Modal.Footer>
-        </form>
+              <div className="input-group message-input">
+                <textarea
+                  className="form-control"
+                  placeholder="Type your message..."
+                  name="content"
+                  rows={3}
+                  onChange={handleChange}
+                />
+                <div className="ms-2">
+                  <button className="btn btn-warning" type="submit">
+                    Send
+                  </button>
+                </div>
+              </div>
+            </form>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+        </Modal.Footer>
       </Modal>
       {contributions.length > 0 && (
         <>
@@ -521,12 +536,18 @@ const ContributionComponent = ({ annualMagazine }) => {
                   </td>
                   <td>{contribution.user.faculty.name}</td>
                   <td>
-                    <Button
-                      variant="outline-warning"
-                      onClick={handleGiveFeedback(contribution.contributionId)}
-                    >
-                      View
-                    </Button>
+                    <div className="d-flex flex-wrap gap-2">
+                      <Button
+                        variant="outline-warning"
+                        onClick={handleGiveFeedback(
+                          contribution.contributionId
+                        )}
+                      >
+                        View
+                      </Button>
+                      <Button variant="outline-success">Publish</Button>
+                      <Button variant="outline-danger">Unreleased</Button>
+                    </div>
                   </td>
                 </tr>
               ))}

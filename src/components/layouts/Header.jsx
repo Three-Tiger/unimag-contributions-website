@@ -26,6 +26,10 @@ const Header = () => {
     return authService.isLogin();
   };
 
+  const isStudent = () => {
+    return authService.getUserRole() === "Student";
+  };
+
   const handleLogout = () => {
     swalService.confirmToHandle(
       "Are you sure you want to logout?",
@@ -75,14 +79,13 @@ const Header = () => {
                   <Link className="nav-link" to="/article">
                     Article
                   </Link>
-                  <Link className="nav-link" to="/submission">
-                    Submission
-                  </Link>
+                  {isStudent() && (
+                    <Link className="nav-link" to="/submission">
+                      Submission
+                    </Link>
+                  )}
                   <Link className="nav-link" to="/about">
                     About
-                  </Link>
-                  <Link className="nav-link" to="/contact">
-                    Contact
                   </Link>
                 </Nav>
                 <div className="text-center">
@@ -120,14 +123,16 @@ const Header = () => {
                               My Profile
                             </Link>
                           </li>
-                          <li>
-                            <Link
-                              className="dropdown-item"
-                              to="my-contribution"
-                            >
-                              My Contribution
-                            </Link>
-                          </li>
+                          {isStudent() && (
+                            <li>
+                              <Link
+                                className="dropdown-item"
+                                to="my-contribution"
+                              >
+                                My Contribution
+                              </Link>
+                            </li>
+                          )}
                           <li>
                             <hr className="dropdown-divider" />
                           </li>

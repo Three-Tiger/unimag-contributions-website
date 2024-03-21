@@ -1,9 +1,4 @@
-import {
-  Route,
-  RouterProvider,
-  createBrowserRouter,
-  useRoutes,
-} from "react-router-dom";
+import { useRoutes } from "react-router-dom";
 import "./App.css";
 import LoginPage from "./pages/LoginPage.jsx";
 import FacultyPage from "./pages/FacultyPage.jsx";
@@ -19,6 +14,8 @@ import HomePage from "./pages/HomePage.jsx";
 import Protected from "./components/layouts/Protected.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import UserPage from "./pages/UserPage.jsx";
+import AdminProtected from "./components/layouts/AdminProtected.jsx";
+import StudentProtected from "./components/layouts/StudentProtected.jsx";
 
 function App() {
   const router = useRoutes([
@@ -35,6 +32,10 @@ function App() {
       element: <RegisterPage />,
     },
     {
+      path: "/about",
+      element: <AboutPage />,
+    },
+    {
       path: "/profile",
       element: (
         <Protected>
@@ -44,23 +45,35 @@ function App() {
     },
     {
       path: "/faculty",
-      element: <AllFacultyPage />,
-    },
-    {
-      path: "/about",
-      element: <AboutPage />,
-    },
-    {
-      path: "/submission",
       element: (
         <Protected>
-          <SubmissionPage />
+          <AllFacultyPage />
         </Protected>
       ),
     },
     {
+      path: "/submission",
+      element: (
+        <StudentProtected>
+          <SubmissionPage />
+        </StudentProtected>
+      ),
+    },
+    {
       path: "/article",
-      element: <ArticlePage />,
+      element: (
+        <Protected>
+          <ArticlePage />
+        </Protected>
+      ),
+    },
+    {
+      path: "/my-contribution",
+      element: (
+        <StudentProtected>
+          <ContributionPage />
+        </StudentProtected>
+      ),
     },
     {
       path: "/admin",
@@ -68,41 +81,41 @@ function App() {
         {
           path: "dashboard",
           element: (
-            <Protected>
+            <AdminProtected>
               <DashboardPage />
-            </Protected>
+            </AdminProtected>
           ),
         },
         {
           path: "faculty",
           element: (
-            <Protected>
+            <AdminProtected>
               <FacultyPage />
-            </Protected>
+            </AdminProtected>
           ),
         },
         {
           path: "annual-magazine",
           element: (
-            <Protected>
+            <AdminProtected>
               <AnnualMagazinePage />
-            </Protected>
+            </AdminProtected>
           ),
         },
         {
           path: "contribution",
           element: (
-            <Protected>
+            <AdminProtected>
               <ContributionPage />
-            </Protected>
+            </AdminProtected>
           ),
         },
         {
           path: "user",
           element: (
-            <Protected>
+            <AdminProtected>
               <UserPage />
-            </Protected>
+            </AdminProtected>
           ),
         },
       ],

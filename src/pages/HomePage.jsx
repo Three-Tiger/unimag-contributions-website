@@ -21,8 +21,14 @@ function HomePage() {
     return authService.getUserRole() === "Student";
   };
 
-  if (isAuthenticated() && !isStudent()) {
-    return <Navigate to="/admin/dashboard" />;
+  const isGuest = () => {
+    return authService.getUserRole() === "Guest";
+  };
+
+  if (isAuthenticated()) {
+    if (!isStudent() && !isGuest()) {
+      return <Navigate to="/admin/dashboard" />;
+    }
   }
 
   useEffect(() => {

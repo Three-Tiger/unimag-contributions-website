@@ -6,7 +6,18 @@ const Protected = ({ children }) => {
     return authService.isLogin();
   };
 
+  const isStudent = () => {
+    return authService.getUserRole() === "Student";
+  };
+
+  const isGuest = () => {
+    return authService.getUserRole() === "Guest";
+  };
+
   if (isAuthenticated()) {
+    if (!isStudent() && !isGuest()) {
+      return <Navigate to="/admin/dashboard" />;
+    }
     return children;
   }
 

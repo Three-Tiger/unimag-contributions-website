@@ -17,9 +17,13 @@ const ProfilePage = () => {
     return authService.getUserRole() === "Student";
   };
 
+  const isGuest = () => {
+    return authService.getUserRole() === "Guest";
+  };
+
   return (
     <>
-      {!isStudent() ? (
+      {!isStudent() && !isGuest() ? (
         <AdminLayout>
           <ProfileComponent />
         </AdminLayout>
