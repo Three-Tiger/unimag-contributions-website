@@ -32,9 +32,9 @@ const ContributionPage = () => {
       <AdminLayout>
         {annualMagazines.length > 0 && (
           <Tabs activeKey={key} onSelect={(k) => setKey(k)} className="mb-3">
-            {annualMagazines.map((annualMagazine) => (
+            {annualMagazines.map((annualMagazine, index) => (
               <Tab
-                key={annualMagazine.academicYear}
+                key={index}
                 eventKey={annualMagazine.academicYear}
                 title={annualMagazine.academicYear}
               >

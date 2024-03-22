@@ -43,9 +43,10 @@ const AboutPage = () => {
         <Col>
           <Row>
             <img
-              style={{ width: "1380px", height: "800px" }}
+              style={{ height: "800px" }}
               src={myImage}
               alt="Description of the image"
+              className="p-0"
             />
           </Row>
 
@@ -53,10 +54,10 @@ const AboutPage = () => {
             {descrip.map((description) => (
               <Row>
                 <Card.Body>
-                  <Row className="justify-content-center">
+                  <div className="mb-3">
                     <h4>{description.description}</h4>
                     <p>{description.content}</p>
-                  </Row>
+                  </div>
                 </Card.Body>
               </Row>
             ))}
@@ -64,7 +65,7 @@ const AboutPage = () => {
 
           <Row className="justify-content-center">
             <Col xs="auto" className="">
-              <Link to="/#">
+              <Link to="/">
                 <Button variant="outline-warning" size="lg">
                   Get Started
                 </Button>

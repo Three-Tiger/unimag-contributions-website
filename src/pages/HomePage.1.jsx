@@ -8,9 +8,8 @@ import handleError from "../services/HandleErrors";
 import authService from "../services/AuthService";
 import contributionApi from "../api/contributionApi";
 import formatDateTime from "../services/FormatDateTime";
-import fileDetailApi from "../api/fileDetailApi";
 
-function HomePage() {
+export function HomePage() {
   const [contributionsPublished, setContributionsPublished] = useState([]);
   const [faculties, setFaculties] = useState([]);
 
@@ -32,16 +31,15 @@ function HomePage() {
     }
   }
 
-  const downloadArticle = (contributionId, title) => async () => {
+  const downloadArticle = (contributionId) => async () => {
     try {
-      const response = await fileDetailApi.downloadMultipleFile(contributionId);
-      const url = window.URL.createObjectURL(new Blob([response]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", title + ".zip");
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
+      // const response = await contributionApi.download(contributionId);
+      // const url = window.URL.createObjectURL(new Blob([response]));
+      // const link = document.createElement("a");
+      // link.href = url;
+      // link.setAttribute("download", "article.pdf");
+      // document.body.appendChild(link);
+      // link.click();
     } catch (error) {
       handleError.showError(error);
     }
@@ -116,8 +114,8 @@ function HomePage() {
             <div className="d-flex justify-content-between align-items-center mb-5">
               <h2 className="fw-bold mb-0">Faculty</h2>
               {/* <Link to="/faculty">
-                <Button variant="outline-warning">View All</Button>
-              </Link> */}
+              <Button variant="outline-warning">View All</Button>
+            </Link> */}
             </div>
             <Row>
               {faculties.map((course, index) => (
@@ -203,22 +201,19 @@ function HomePage() {
                         <h5 className="fw-bold">{contribution.title}</h5>
                       </Card.Title>
                       {/* <Card.Text>
-                        <p className="description">{article.description}</p>
-                      </Card.Text> */}
+                      <p className="description">{article.description}</p>
+                    </Card.Text> */}
                       <div className="text-end">
                         {/* <Link to={`/article/${contribution.contributionId}`}>
-                          <Button variant="outline-warning">
-                            <i className="bi bi-arrow-up-right"></i>
-                          </Button>
-                        </Link> */}
+                      <Button variant="outline-warning">
+                        <i className="bi bi-arrow-up-right"></i>
+                      </Button>
+                    </Link> */}
                         <Button
                           variant="outline-warning"
-                          onClick={downloadArticle(
-                            contribution.contributionId,
-                            contribution.title
-                          )}
+                          onClick={downloadArticle(contribution.contributionId)}
                         >
-                          <i className="bi bi-download"></i>
+                          <i class="bi bi-download"></i>
                         </Button>
                       </div>
                     </Card.Body>
@@ -232,5 +227,3 @@ function HomePage() {
     </>
   );
 }
-
-export default HomePage;

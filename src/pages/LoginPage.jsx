@@ -136,7 +136,8 @@ function LoginPage() {
                     </Form>
                     <div className="mt-3 text-center">
                       <div className="border-1">
-                        Don’t have an account? <Link to="#">Sign Up</Link>
+                        Don’t have an account?{" "}
+                        <Link to="/register">Sign Up</Link>
                       </div>
                     </div>
                   </Card.Text>

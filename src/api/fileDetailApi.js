@@ -16,6 +16,11 @@ class FileDetailApi {
         return axiosClient.get(url);
     }
 
+    readFile(fileId) {
+        const url = `/api/file-details/${fileId}/read`;
+        return axiosClient.get(url);
+    }
+
     downloadMultipleFile(contributionId) {
         const url = `/api/file-details/${contributionId}/download-multiple`;
         return axiosClient.get(url);

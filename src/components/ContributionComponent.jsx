@@ -20,6 +20,7 @@ const ContributionComponent = ({ annualMagazine }) => {
     "Full name",
     "Avatar",
     "Faculty",
+    "Is Published",
     "Action",
   ];
   const [show, setShow] = useState(false);
@@ -28,6 +29,9 @@ const ContributionComponent = ({ annualMagazine }) => {
   const [formData, setFormData] = useState({
     status: "",
     content: "",
+  });
+  const [formPublishData, setFormPublishData] = useState({
+    isPublished: false,
   });
   const [userData, setUserData] = useState(null);
   const bottomOfChatRef = useRef(null);
@@ -51,6 +55,9 @@ const ContributionComponent = ({ annualMagazine }) => {
     setFormData({
       status: response.status,
       content: "",
+    });
+    setFormPublishData({
+      isPublished: response.isPublished,
     });
     handleShow();
   };
@@ -106,11 +113,57 @@ const ContributionComponent = ({ annualMagazine }) => {
     });
   };
 
+  const handleChangePublished = (event) => {
+    const { value } = event.target;
+    setFormPublishData({
+      isPublished: value === "true",
+    });
+  };
+
   // Function to scroll the chat container to the bottom
   const scrollToBottom = () => {
     if (bottomOfChatRef.current) {
       bottomOfChatRef.current.scrollIntoView({ behavior: "smooth" });
     }
+  };
+
+  const handleSubmitPublish = async (event) => {
+    event.preventDefault();
+    const contributionData = {
+      contributionId: contribution.contributionId,
+      title: contribution.title,
+      submissionDate: contribution.submissionDate,
+      status: contribution.status,
+      isPublished: formPublishData.isPublished,
+      userId: contribution.user.userId,
+      annualMagazineId: annualMagazine.annualMagazineId,
+    };
+    // Update contribution
+    await contributionApi.update(contributionData);
+
+    // Update status in the state
+    setContribution({ ...contribution, status: formPublishData.isPublished });
+
+    // Update status in the contributions state
+    setContributions((previousState) => {
+      return previousState.map((c) => {
+        if (c.contributionId === contribution.contributionId) {
+          return {
+            ...c,
+            isPublished: formPublishData.isPublished,
+          };
+        }
+        return c;
+      });
+    });
+
+    swalService.showMessage(
+      "Success",
+      `You have set the publication status to ${
+        formPublishData.isPublished ? "Published" : "Unreleased"
+      }`,
+      "success"
+    );
   };
 
   const handleSubmit = async (event) => {
@@ -122,6 +175,7 @@ const ContributionComponent = ({ annualMagazine }) => {
         title: contribution.title,
         submissionDate: contribution.submissionDate,
         status: formData.status,
+        isPublished: contribution.isPublished,
         userId: contribution.user.userId,
         annualMagazineId: annualMagazine.annualMagazineId,
       };
@@ -309,55 +363,101 @@ const ContributionComponent = ({ annualMagazine }) => {
           {isManager() ? (
             <div>
               {contribution.feedbacks?.length > 0 && (
-                <Table striped>
-                  <tbody>
-                    <tr>
-                      <td className="fw-bold col-3">Status</td>
-                      <td>
-                        {contribution.status == "Approved" ? (
-                          <Badge bg="success">{contribution.status}</Badge>
-                        ) : (
-                          <Badge bg="danger">{contribution.status}</Badge>
-                        )}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="fw-bold col-3">Feedback on</td>
-                      <td>
-                        {formatDateTime.toDateTimeString(
-                          contribution.feedbacks[0].feedbackDate
-                        )}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="fw-bold col-3">Feedback by</td>
-                      <td>
-                        <div className="d-flex gap-2">
-                          <img
-                            src={
-                              contribution.feedbacks[0].user.profilePicture
-                                ? `/api/users/${contribution.feedbacks[0].user.userId}/image`
-                                : "/image/default-avatar.png"
-                            }
-                            width={25}
-                            height={25}
-                            roundedCircle
-                          />
-                          <p className="mb-0">
-                            {contribution.feedbacks[0].user.firstName}{" "}
-                            {contribution.feedbacks[0].user.lastName}
-                          </p>
-                        </div>
-                      </td>
-                    </tr>
-                    {/* <tr>
-                      <td className="fw-bold col-3">Feedback comment</td>
-                      <td className="col-9">
-                        <pre>{contribution.feedbacks[0].content}</pre>
-                      </td>
-                    </tr> */}
-                  </tbody>
-                </Table>
+                <form onSubmit={handleSubmitPublish}>
+                  <Table striped>
+                    <tbody>
+                      <tr>
+                        <td className="fw-bold col-3">Is Published</td>
+                        <td>
+                          <div className="mb-3">
+                            <label htmlFor="facultyName" className="form-label">
+                              Your decision (choose one option)
+                            </label>
+                            <div>
+                              <input
+                                type="radio"
+                                className="btn-check"
+                                name="isPublished"
+                                id="success-outlined"
+                                value="true"
+                                autoComplete="off"
+                                checked={formPublishData.isPublished}
+                                onChange={handleChangePublished}
+                              />
+                              <label
+                                className="btn btn-outline-success me-2"
+                                htmlFor="success-outlined"
+                              >
+                                Published
+                              </label>
+
+                              <input
+                                type="radio"
+                                className="btn-check"
+                                name="isPublished"
+                                id="danger-outlined"
+                                value="false"
+                                autoComplete="off"
+                                checked={!formPublishData.isPublished}
+                                onChange={handleChangePublished}
+                              />
+                              <label
+                                className="btn btn-outline-danger me-2"
+                                htmlFor="danger-outlined"
+                              >
+                                Unreleased
+                              </label>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="fw-bold col-3">Status</td>
+                        <td>
+                          {contribution.status == "Approved" ? (
+                            <Badge bg="success">{contribution.status}</Badge>
+                          ) : (
+                            <Badge bg="danger">{contribution.status}</Badge>
+                          )}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="fw-bold col-3">Feedback on</td>
+                        <td>
+                          {formatDateTime.toDateTimeString(
+                            contribution.feedbacks[0].feedbackDate
+                          )}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="fw-bold col-3">Feedback by</td>
+                        <td>
+                          <div className="d-flex gap-2">
+                            <img
+                              src={
+                                contribution.feedbacks[0].user.profilePicture
+                                  ? `/api/users/${contribution.feedbacks[0].user.userId}/image`
+                                  : "/image/default-avatar.png"
+                              }
+                              width={25}
+                              height={25}
+                              roundedCircle
+                            />
+                            <p className="mb-0">
+                              {contribution.feedbacks[0].user.firstName}{" "}
+                              {contribution.feedbacks[0].user.lastName}
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </Table>
+                  <div className="text-center">
+                    <Button variant="outline-warning" type="submit">
+                      Confirm
+                    </Button>
+                  </div>
+                </form>
               )}
             </div>
           ) : (
@@ -536,6 +636,17 @@ const ContributionComponent = ({ annualMagazine }) => {
                   </td>
                   <td>{contribution.user.faculty.name}</td>
                   <td>
+                    <span
+                      className={
+                        contribution.isPublished
+                          ? "badge bg-success"
+                          : "badge bg-danger"
+                      }
+                    >
+                      {contribution.isPublished ? "Published" : "Unreleased"}
+                    </span>
+                  </td>
+                  <td>
                     <div className="d-flex flex-wrap gap-2">
                       <Button
                         variant="outline-warning"
@@ -545,8 +656,8 @@ const ContributionComponent = ({ annualMagazine }) => {
                       >
                         View
                       </Button>
-                      <Button variant="outline-success">Publish</Button>
-                      <Button variant="outline-danger">Unreleased</Button>
+                      {/* <Button variant="outline-success">Publish</Button>
+                      <Button variant="outline-danger">Unreleased</Button> */}
                     </div>
                   </td>
                 </tr>

@@ -16,7 +16,7 @@ axiosClient.interceptors.request.use(
     function (config) {
         if (config.data instanceof FormData) {
             config.headers['Content-Type'] = 'multipart/form-data';
-        } else if (config.url.includes('download') || config.url.includes('download-multiple')) {
+        } else if (config.url.includes('download') || config.url.includes('download-multiple') || config.url.includes('read')) {
             config.responseType = 'blob';
         } else {
             config.headers['Content-Type'] = 'application/json';

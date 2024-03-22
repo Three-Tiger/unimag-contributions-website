@@ -127,7 +127,7 @@ const Header = () => {
                             <li>
                               <Link
                                 className="dropdown-item"
-                                to="my-contribution"
+                                to="/my-contribution"
                               >
                                 My Contribution
                               </Link>
