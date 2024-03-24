@@ -22,6 +22,7 @@ const UserPage = () => {
   ];
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState([]);
   const [faculties, setFaculties] = useState([]);
   const [roles, setRoles] = useState([]);
   const [modelTitle, setModelTitle] = useState("Add new User");
@@ -119,9 +120,9 @@ const UserPage = () => {
 
   // Remove
   const handleRemove = (id) => {
-    swalService.confirmDelete(() => {
+    swalService.confirmDelete(async () => {
       try {
-        userApi.delete(id);
+        await userApi.delete(id);
         setUsers((previousState) => {
           return previousState.filter((user) => user.userId !== id);
         });
@@ -137,6 +138,14 @@ const UserPage = () => {
       ...formData,
       [name]: value,
     });
+  };
+
+  const handleSearch = (event) => {
+    const { value } = event.target;
+    const filter = users.filter((user) => {
+      return user.email.toLowerCase().includes(value.toLowerCase());
+    });
+    setSearch(filter);
   };
 
   // Form
@@ -267,223 +276,219 @@ const UserPage = () => {
       <AdminLayout>
         <h3 className="text-center fw-bold">User Management</h3>
         <nav className="navbar navbar-light bg-light mb-2">
-          <div className="container-fluid">
-            <form className="d-flex">
-              <input
-                className="form-control me-2"
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
-              />
-              <Button variant="outline-warning" type="submit">
-                Search
-              </Button>
-            </form>
-            <Button variant="warning" onClick={handleShow}>
-              <i className="bi bi-plus-circle"></i> Add
-            </Button>
-
-            <Modal
-              show={show}
-              onHide={handleClose}
-              backdrop="static"
-              keyboard={false}
-              centered
-              size="lg"
-            >
-              <form onSubmit={handleSubmit}>
-                <Modal.Header closeButton>
-                  <Modal.Title>{modelTitle}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                  <div className="mb-3 text-center">
-                    <label>
-                      <img
-                        src={previewImage}
-                        width={100}
-                        height={100}
-                        className="rounded-circle mb-2"
-                        alt="Preview"
-                      />
-                    </label>
-                    <input
-                      type="file"
-                      className="form-control"
-                      name="newProfilePicture"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                    />
-                  </div>
-
-                  <div className="mb-3">
-                    <label>Email</label>
-                    <input
-                      type="email"
-                      className={`form-control ${
-                        error.email ? "is-invalid" : ""
-                      }`}
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                    />
-                    <div className="invalid-feedback">{error.email}</div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label>Password</label>
-                    <input
-                      type="password"
-                      className={`form-control ${
-                        error.password ? "is-invalid" : ""
-                      }`}
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                    />
-                    <div className="invalid-feedback">{error.password}</div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label>Confirm Password</label>
-                    <input
-                      type="password"
-                      className={`form-control ${
-                        error.confirmPassword ? "is-invalid" : ""
-                      }`}
-                      name="confirmPassword"
-                      onChange={handleChange}
-                    />
-                    <div className="invalid-feedback">
-                      {error.confirmPassword}
-                    </div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label>Select Role</label>
-                    <select
-                      className={`form-select ${
-                        error.roleId ? "is-invalid" : ""
-                      }`}
-                      aria-label="Default select example"
-                      name="roleId"
-                      value={formData.roleId}
-                      onChange={handleChange}
-                    >
-                      <option value="">Please choose role</option>
-                      {roles.map((role, index) => (
-                        <option key={index} value={role.roleId}>
-                          {role.name}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="invalid-feedback">{error.roleId}</div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label>Select Faculty</label>
-                    <select
-                      className={`form-select ${
-                        error.facultyId ? "is-invalid" : ""
-                      }`}
-                      aria-label="Default select example"
-                      name="facultyId"
-                      value={formData.facultyId}
-                      onChange={handleChange}
-                    >
-                      <option value="">Please choose faculty</option>
-                      {faculties.map((faculty, index) => (
-                        <option key={index} value={faculty.facultyId}>
-                          {faculty.name}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="invalid-feedback">{error.facultyId}</div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label>First Name</label>
-                    <input
-                      type="text"
-                      className={`form-control ${
-                        error.firstName ? "is-invalid" : ""
-                      }`}
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                    />
-                    <div className="invalid-feedback">{error.firstName}</div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label>Last Name</label>
-                    <input
-                      type="text"
-                      className={`form-control ${
-                        error.lastName ? "is-invalid" : ""
-                      }`}
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                    />
-                    <div className="invalid-feedback">{error.lastName}</div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label>Date of Birth</label>
-                    <input
-                      type="date"
-                      className={`form-control ${
-                        error.dateOfBirth ? "is-invalid" : ""
-                      }`}
-                      name="dateOfBirth"
-                      value={formData.dateOfBirth}
-                      onChange={handleChange}
-                    />
-                    <div className="invalid-feedback">{error.dateOfBirth}</div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label>Phone Number</label>
-                    <input
-                      type="text"
-                      className={`form-control ${
-                        error.phoneNumber ? "is-invalid" : ""
-                      }`}
-                      name="phoneNumber"
-                      value={formData.phoneNumber}
-                      onChange={handleChange}
-                    />
-                    <div className="invalid-feedback">{error.phoneNumber}</div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label>Address</label>
-                    <textarea
-                      className={`form-control ${
-                        error.address ? "is-invalid" : ""
-                      }`}
-                      name="address"
-                      value={formData.address}
-                      onChange={handleChange}
-                    />
-                    <div className="invalid-feedback">{error.address}</div>
-                  </div>
-                </Modal.Body>
-                <Modal.Footer>
-                  <Button variant="secondary" onClick={handleClose}>
-                    Close
-                  </Button>
-                  <Button variant="warning" type="submit" disabled={isLoading}>
-                    {isLoading ? (
-                      <Spinner animation="border" variant="dark" />
-                    ) : (
-                      "Submit"
-                    )}
-                  </Button>
-                </Modal.Footer>
-              </form>
-            </Modal>
+          <div>
+            <input
+              className="form-control me-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+              onChange={handleSearch}
+            />
           </div>
+          <Button variant="warning" onClick={handleShow}>
+            <i className="bi bi-plus-circle"></i> Add
+          </Button>
+
+          <Modal
+            show={show}
+            onHide={handleClose}
+            backdrop="static"
+            keyboard={false}
+            centered
+            size="lg"
+          >
+            <form onSubmit={handleSubmit}>
+              <Modal.Header closeButton>
+                <Modal.Title>{modelTitle}</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <div className="mb-3 text-center">
+                  <label>
+                    <img
+                      src={previewImage}
+                      width={100}
+                      height={100}
+                      className="rounded-circle mb-2"
+                      alt="Preview"
+                    />
+                  </label>
+                  <input
+                    type="file"
+                    className="form-control"
+                    name="newProfilePicture"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    className={`form-control ${
+                      error.email ? "is-invalid" : ""
+                    }`}
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                  <div className="invalid-feedback">{error.email}</div>
+                </div>
+
+                <div className="mb-3">
+                  <label>Password</label>
+                  <input
+                    type="password"
+                    className={`form-control ${
+                      error.password ? "is-invalid" : ""
+                    }`}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                  <div className="invalid-feedback">{error.password}</div>
+                </div>
+
+                <div className="mb-3">
+                  <label>Confirm Password</label>
+                  <input
+                    type="password"
+                    className={`form-control ${
+                      error.confirmPassword ? "is-invalid" : ""
+                    }`}
+                    name="confirmPassword"
+                    onChange={handleChange}
+                  />
+                  <div className="invalid-feedback">
+                    {error.confirmPassword}
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <label>Select Role</label>
+                  <select
+                    className={`form-select ${
+                      error.roleId ? "is-invalid" : ""
+                    }`}
+                    aria-label="Default select example"
+                    name="roleId"
+                    value={formData.roleId}
+                    onChange={handleChange}
+                  >
+                    <option value="">Please choose role</option>
+                    {roles.map((role, index) => (
+                      <option key={index} value={role.roleId}>
+                        {role.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="invalid-feedback">{error.roleId}</div>
+                </div>
+
+                <div className="mb-3">
+                  <label>Select Faculty</label>
+                  <select
+                    className={`form-select ${
+                      error.facultyId ? "is-invalid" : ""
+                    }`}
+                    aria-label="Default select example"
+                    name="facultyId"
+                    value={formData.facultyId}
+                    onChange={handleChange}
+                  >
+                    <option value="">Please choose faculty</option>
+                    {faculties.map((faculty, index) => (
+                      <option key={index} value={faculty.facultyId}>
+                        {faculty.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="invalid-feedback">{error.facultyId}</div>
+                </div>
+
+                <div className="mb-3">
+                  <label>First Name</label>
+                  <input
+                    type="text"
+                    className={`form-control ${
+                      error.firstName ? "is-invalid" : ""
+                    }`}
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                  />
+                  <div className="invalid-feedback">{error.firstName}</div>
+                </div>
+
+                <div className="mb-3">
+                  <label>Last Name</label>
+                  <input
+                    type="text"
+                    className={`form-control ${
+                      error.lastName ? "is-invalid" : ""
+                    }`}
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                  />
+                  <div className="invalid-feedback">{error.lastName}</div>
+                </div>
+
+                <div className="mb-3">
+                  <label>Date of Birth</label>
+                  <input
+                    type="date"
+                    className={`form-control ${
+                      error.dateOfBirth ? "is-invalid" : ""
+                    }`}
+                    name="dateOfBirth"
+                    value={formData.dateOfBirth}
+                    onChange={handleChange}
+                  />
+                  <div className="invalid-feedback">{error.dateOfBirth}</div>
+                </div>
+
+                <div className="mb-3">
+                  <label>Phone Number</label>
+                  <input
+                    type="text"
+                    className={`form-control ${
+                      error.phoneNumber ? "is-invalid" : ""
+                    }`}
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={handleChange}
+                  />
+                  <div className="invalid-feedback">{error.phoneNumber}</div>
+                </div>
+
+                <div className="mb-3">
+                  <label>Address</label>
+                  <textarea
+                    className={`form-control ${
+                      error.address ? "is-invalid" : ""
+                    }`}
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                  />
+                  <div className="invalid-feedback">{error.address}</div>
+                </div>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                  Close
+                </Button>
+                <Button variant="warning" type="submit" disabled={isLoading}>
+                  {isLoading ? (
+                    <Spinner animation="border" variant="dark" />
+                  ) : (
+                    "Submit"
+                  )}
+                </Button>
+              </Modal.Footer>
+            </form>
+          </Modal>
         </nav>
         <Table striped bordered hover responsive>
           <thead>
@@ -494,43 +499,85 @@ const UserPage = () => {
             </tr>
           </thead>
           <tbody>
-            {users.map((user, index) => (
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{user.email}</td>
-                <td>{user.firstName}</td>
-                <td>{user.lastName}</td>
-                <td>
-                  <img
-                    src={
-                      user.profilePicture
-                        ? `/api/users/${user.userId}/image`
-                        : "/image/default-avatar.png"
-                    }
-                    alt={user.firstName}
-                    width="50"
-                    height="50"
-                    className="rounded-circle"
-                  />
-                </td>
-                <td>{user.role.name}</td>
-                <td>{user.faculty.name}</td>
-                <td className="d-flex flex-wrap gap-2">
-                  <Button
-                    variant="outline-warning"
-                    onClick={() => showEdit(user.userId)}
-                  >
-                    Edit
-                  </Button>
-                  {/* <Button
-                    variant="danger"
-                    onClick={() => handleRemove(user.userId)}
-                  >
-                    Delete
-                  </Button> */}
-                </td>
-              </tr>
-            ))}
+            {search.length > 0
+              ? search.map((user, index) => (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{user.email}</td>
+                    <td>{user.firstName}</td>
+                    <td>{user.lastName}</td>
+                    <td>
+                      <img
+                        src={
+                          user.profilePicture
+                            ? `/api/users/${user.userId}/image`
+                            : "/image/default-avatar.png"
+                        }
+                        alt={user.firstName}
+                        width="50"
+                        height="50"
+                        className="rounded-circle"
+                      />
+                    </td>
+                    <td>{user.role.name}</td>
+                    <td>{user.faculty.name}</td>
+                    <td>
+                      <div className="d-flex flex-wrap gap-2">
+                        <Button
+                          variant="outline-warning"
+                          onClick={() => showEdit(user.userId)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="danger"
+                          onClick={() => handleRemove(user.userId)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              : users.map((user, index) => (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{user.email}</td>
+                    <td>{user.firstName}</td>
+                    <td>{user.lastName}</td>
+                    <td>
+                      <img
+                        src={
+                          user.profilePicture
+                            ? `/api/users/${user.userId}/image`
+                            : "/image/default-avatar.png"
+                        }
+                        alt={user.firstName}
+                        width="50"
+                        height="50"
+                        className="rounded-circle"
+                      />
+                    </td>
+                    <td>{user.role.name}</td>
+                    <td>{user.faculty.name}</td>
+                    <td>
+                      <div className="d-flex flex-wrap gap-2">
+                        <Button
+                          variant="outline-warning"
+                          onClick={() => showEdit(user.userId)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="danger"
+                          onClick={() => handleRemove(user.userId)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
           </tbody>
         </Table>
       </AdminLayout>

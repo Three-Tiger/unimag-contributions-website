@@ -6,6 +6,11 @@ class ContributionApi {
         return axiosClient.get(url);
     }
 
+    getContributionsByFilter(filter) {
+        const url = `/api/contributions/filter`;
+        return axiosClient.get(url, { params: filter });
+    }
+
     getById(contributionId) {
         const url = `/api/contributions/${contributionId}`;
         return axiosClient.get(url);

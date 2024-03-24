@@ -22,7 +22,7 @@ class StatisticApi {
     }
 
     getRecentContribution() {
-        const url = "/api/contributions/top-6";
+        const url = "/api/statistics/top-6";
         return axiosClient.get(url);
     }
 }

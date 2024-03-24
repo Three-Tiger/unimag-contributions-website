@@ -33,6 +33,10 @@ const ContributionComponent = ({ annualMagazine }) => {
   const [formPublishData, setFormPublishData] = useState({
     isPublished: false,
   });
+  const [formFilterData, setFormFilterData] = useState({
+    status: "",
+    isPublished: "",
+  });
   const [userData, setUserData] = useState(null);
   const bottomOfChatRef = useRef(null);
 
@@ -120,10 +124,35 @@ const ContributionComponent = ({ annualMagazine }) => {
     });
   };
 
+  const handleFilterChange = async (event) => {
+    const { name, value } = event.target;
+    setFormFilterData({
+      ...formFilterData,
+      [name]: value,
+    });
+  };
+
   // Function to scroll the chat container to the bottom
   const scrollToBottom = () => {
     if (bottomOfChatRef.current) {
       bottomOfChatRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleSubmitFilter = async (event) => {
+    event.preventDefault();
+    if (formFilterData.status || formFilterData.isPublished) {
+      const response = await contributionApi.getContributionsByFilter({
+        annualMagazineId: annualMagazine.annualMagazineId,
+        status: formFilterData.status,
+        isPublished: formFilterData.isPublished,
+      });
+      setContributions(response);
+    } else {
+      const response = await contributionApi.getContributionsByAnnualMagazineId(
+        annualMagazine.annualMagazineId
+      );
+      setContributions(response);
     }
   };
 
@@ -577,94 +606,114 @@ const ContributionComponent = ({ annualMagazine }) => {
           </Button>
         </Modal.Footer>
       </Modal>
+      {isManager() && (
+        <div className="d-flex justify-content-between mb-2 text-end">
+          <form onSubmit={handleSubmitFilter} className="d-flex gap-2">
+            <select
+              className="form-select"
+              aria-label="Default select example"
+              name="status"
+              onChange={handleFilterChange}
+            >
+              <option value="">Select status</option>
+              <option value="Waiting">Waiting</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+            <select
+              className="form-select"
+              aria-label="Default select example"
+              name="isPublished"
+              onChange={handleFilterChange}
+            >
+              <option value="">Select published</option>
+              <option value="true">Published</option>
+              <option value="false">Unreleased</option>
+            </select>
+            <Button variant="outline-warning" type="submit">
+              Filter
+            </Button>
+          </form>
+          <Button variant="outline-warning" onClick={() => downloadAll()}>
+            Download All
+          </Button>
+        </div>
+      )}
       {contributions.length > 0 && (
-        <>
-          {isManager() && (
-            <div className="mb-2 text-end">
-              <Button variant="outline-warning" onClick={() => downloadAll()}>
-                Download All
-              </Button>
-            </div>
-          )}
-          <Table striped bordered hover responsive>
-            <thead>
-              <tr>
-                {row.map((item, index) => (
-                  <th key={index}>{item}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {contributions.map((contribution, index) => (
-                <tr key={index} className="align-middle">
-                  <td>{index + 1}</td>
-                  <td>{contribution.title}</td>
-                  <td>
-                    {formatDateTime.toDateTimeString(
-                      contribution.submissionDate
-                    )}
-                  </td>
-                  <td>
-                    <span
-                      className={
-                        contribution.status === "Waiting"
-                          ? "badge bg-warning"
-                          : contribution.status === "Approved"
-                          ? "badge bg-success"
-                          : "badge bg-danger"
-                      }
-                    >
-                      {contribution.status}
-                    </span>
-                  </td>
-                  <td>{contribution.user.email}</td>
-                  <td>
-                    {contribution.user.firstName} {contribution.user.lastName}
-                  </td>
-                  <td>
-                    <img
-                      src={
-                        contribution.user.profilePicture
-                          ? `/api/users/${contribution.user.userId}/image`
-                          : "/image/default-avatar.png"
-                      }
-                      alt={contribution.user.firstName}
-                      width="50"
-                      height="50"
-                      className="rounded-circle"
-                    />
-                  </td>
-                  <td>{contribution.user.faculty.name}</td>
-                  <td>
-                    <span
-                      className={
-                        contribution.isPublished
-                          ? "badge bg-success"
-                          : "badge bg-danger"
-                      }
-                    >
-                      {contribution.isPublished ? "Published" : "Unreleased"}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="d-flex flex-wrap gap-2">
-                      <Button
-                        variant="outline-warning"
-                        onClick={handleGiveFeedback(
-                          contribution.contributionId
-                        )}
-                      >
-                        View
-                      </Button>
-                      {/* <Button variant="outline-success">Publish</Button>
-                      <Button variant="outline-danger">Unreleased</Button> */}
-                    </div>
-                  </td>
-                </tr>
+        <Table striped bordered hover responsive>
+          <thead>
+            <tr>
+              {row.map((item, index) => (
+                <th key={index}>{item}</th>
               ))}
-            </tbody>
-          </Table>
-        </>
+            </tr>
+          </thead>
+          <tbody>
+            {contributions.map((contribution, index) => (
+              <tr key={index} className="align-middle">
+                <td>{index + 1}</td>
+                <td>{contribution.title}</td>
+                <td>
+                  {formatDateTime.toDateTimeString(contribution.submissionDate)}
+                </td>
+                <td>
+                  <span
+                    className={
+                      contribution.status === "Waiting"
+                        ? "badge bg-warning"
+                        : contribution.status === "Approved"
+                        ? "badge bg-success"
+                        : "badge bg-danger"
+                    }
+                  >
+                    {contribution.status}
+                  </span>
+                </td>
+                <td>{contribution.user.email}</td>
+                <td>
+                  {contribution.user.firstName} {contribution.user.lastName}
+                </td>
+                <td>
+                  <img
+                    src={
+                      contribution.user.profilePicture
+                        ? `/api/users/${contribution.user.userId}/image`
+                        : "/image/default-avatar.png"
+                    }
+                    alt={contribution.user.firstName}
+                    width="50"
+                    height="50"
+                    className="rounded-circle"
+                  />
+                </td>
+                <td>{contribution.user.faculty.name}</td>
+                <td>
+                  <span
+                    className={
+                      contribution.isPublished
+                        ? "badge bg-success"
+                        : "badge bg-danger"
+                    }
+                  >
+                    {contribution.isPublished ? "Published" : "Unreleased"}
+                  </span>
+                </td>
+                <td>
+                  <div className="d-flex flex-wrap gap-2">
+                    <Button
+                      variant="outline-warning"
+                      onClick={handleGiveFeedback(contribution.contributionId)}
+                    >
+                      View
+                    </Button>
+                    {/* <Button variant="outline-success">Publish</Button>
+                      <Button variant="outline-danger">Unreleased</Button> */}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
       )}
     </>
   );
