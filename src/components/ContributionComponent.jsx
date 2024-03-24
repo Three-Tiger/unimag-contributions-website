@@ -257,13 +257,14 @@ const ContributionComponent = ({ annualMagazine }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response =
-          await contributionApi.getContributionsByAnnualMagazineId(
-            annualMagazine.annualMagazineId
-          );
-        setContributions(response);
         const user = authService.getUserData();
         setUserData(user);
+        const response =
+          await contributionApi.getContributionsByAnnualMagazineIdAndFacultyId(
+            annualMagazine.annualMagazineId,
+            user.faculty.facultyId
+          );
+        setContributions(response);
       } catch (error) {
         handleError.showError(error);
       }
