@@ -1,8 +1,8 @@
 import axiosClient from "./axiosClient";
 
 class ContributionApi {
-    getContributionsByAnnualMagazineId(annualMagazineId) {
-        const url = `/api/contributions/annual-magazine/${annualMagazineId}`;
+    getContributionsByAnnualMagazineIdAndFacultyId(annualMagazineId, facultyId) {
+        const url = `/api/contributions/annual-magazine/${annualMagazineId}/faculty/${facultyId}`;
         return axiosClient.get(url);
     }
 

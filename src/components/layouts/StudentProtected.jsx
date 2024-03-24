@@ -13,7 +13,11 @@ const StudentProtected = ({ children }) => {
     return authService.getUserRole() === "Student";
   };
 
-  if (isAuthenticated() && isStudent()) {
+  const isGuest = () => {
+    return authService.getUserRole() === "Guest";
+  };
+
+  if (isAuthenticated() && (isStudent() || isGuest())) {
     return children;
   }
 
@@ -21,7 +25,7 @@ const StudentProtected = ({ children }) => {
     "Warning",
     "Please login as a student to access this page.",
     "warning",
-    () => navigate("/")
+    () => navigate("/login")
   );
 };
 

@@ -5,13 +5,11 @@ import FacultyPage from "./pages/FacultyPage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import AnnualMagazinePage from "./pages/AnnualMagazine.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
-import AllFacultyPage from "./pages/AllFaculty.jsx";
 import AboutPage from "./pages/AboutPage.jsx";
 import SubmissionPage from "./pages/SubmissionPage.jsx";
 import ArticlePage from "./pages/ArticlePage.jsx";
 import ContributionPage from "./pages/ContributionPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
-import Protected from "./components/layouts/Protected.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import UserPage from "./pages/UserPage.jsx";
 import AdminProtected from "./components/layouts/AdminProtected.jsx";
@@ -40,17 +38,9 @@ function App() {
     {
       path: "/profile",
       element: (
-        <Protected>
+        <StudentProtected>
           <ProfilePage />
-        </Protected>
-      ),
-    },
-    {
-      path: "/faculty",
-      element: (
-        <Protected>
-          <AllFacultyPage />
-        </Protected>
+        </StudentProtected>
       ),
     },
     {
@@ -64,17 +54,17 @@ function App() {
     {
       path: "/article",
       element: (
-        <Protected>
+        <StudentProtected>
           <ArticlePage />
-        </Protected>
+        </StudentProtected>
       ),
     },
     {
       path: "/article/:id",
       element: (
-        <Protected>
+        <StudentProtected>
           <ArticleDetailPage />
-        </Protected>
+        </StudentProtected>
       ),
     },
     {

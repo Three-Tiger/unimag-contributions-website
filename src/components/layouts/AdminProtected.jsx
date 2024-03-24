@@ -1,4 +1,4 @@
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import authService from "../../services/AuthService";
 import swalService from "../../services/SwalService";
 
@@ -9,28 +9,28 @@ const AdminProtected = ({ children }) => {
     return authService.isLogin();
   };
 
-  const isStudent = () => {
-    return authService.getUserRole() === "Student";
+  const isAdmin = () => {
+    return authService.getUserRole() === "Administrator";
   };
 
-  const isGuest = () => {
-    return authService.getUserRole() === "Guest";
+  const isCoordinator = () => {
+    return authService.getUserRole() === "Coordinator";
   };
 
-  if (isAuthenticated()) {
-    if (isStudent() || isGuest()) {
-      // swalService.showMessageToHandle(
-      //   "Warning",
-      //   "You are not authorized to access this page",
-      //   "warning",
-      //   () => navigate("/")
-      // );
-      return <Navigate to="/" />;
-    }
+  const isManager = () => {
+    return authService.getUserRole() === "Manager";
+  };
+
+  if (isAuthenticated() && (isAdmin() || isCoordinator() || isManager())) {
     return children;
   }
 
-  return <Navigate to="/login" />;
+  swalService.showMessageToHandle(
+    "Warning",
+    "You are not authorized to access this page",
+    "warning",
+    () => navigate("/")
+  );
 };
 
 export default AdminProtected;
