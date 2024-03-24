@@ -6,14 +6,14 @@ class HandleError {
             case 400:
                 swalService.showMessage(
                     "Warning",
-                    error.response.data.message,
+                    error.response.data.message || "Bad request.",
                     "warning"
                 );
                 break;
             case 401:
                 swalService.showMessage(
                     "Warning",
-                    error.response.data.message,
+                    error.response.data.message || "Please login to continue.",
                     "warning"
                 );
                 break;
@@ -27,14 +27,14 @@ class HandleError {
             case 404:
                 swalService.showMessage(
                     "Warning",
-                    error.response.data.message,
+                    error.response.data.message || "Resource not found.",
                     "warning"
                 );
                 break;
             case 409:
                 swalService.showMessage(
                     "Warning",
-                    error.response.data.message,
+                    error.response.data.message || "Resource already exists.",
                     "warning"
                 );
                 break;

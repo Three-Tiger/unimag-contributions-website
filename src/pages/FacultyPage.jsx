@@ -10,6 +10,7 @@ const FacultyPage = () => {
   const row = ["#", "Name", "Description", "Action"];
   const [isLoading, setIsLoading] = useState(false);
   const [faculties, setFaculties] = useState([]);
+  const [search, setSearch] = useState([]);
   const [modelTitle, setModelTitle] = useState("Add new Faculty");
   const [show, setShow] = useState(false);
   const [formData, setFormData] = useState({
@@ -55,9 +56,9 @@ const FacultyPage = () => {
 
   // Remove
   const handleRemove = (id) => {
-    swalService.confirmDelete(() => {
+    swalService.confirmDelete(async () => {
       try {
-        facultyApi.Remove(id);
+        await facultyApi.Remove(id);
         setFaculties((previousState) => {
           return previousState.filter((faculty) => faculty.facultyId !== id);
         });
@@ -79,6 +80,14 @@ const FacultyPage = () => {
       ...formData,
       [name]: value,
     });
+  };
+
+  const handleSearch = (event) => {
+    const { value } = event.target;
+    const filter = faculties.filter((faculty) => {
+      return faculty.name.toLowerCase().includes(value.toLowerCase());
+    });
+    setSearch(filter);
   };
 
   // Form
@@ -145,87 +154,81 @@ const FacultyPage = () => {
       <AdminLayout>
         <h3 className="text-center fw-bold">Faculty Management</h3>
         <nav className="navbar navbar-light bg-light mb-2">
-          <div className="container-fluid">
-            <form className="d-flex">
-              <input
-                className="form-control me-2"
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
-              />
-              <Button variant="outline-warning" type="submit">
-                Search
-              </Button>
-            </form>
-            <Button variant="warning" onClick={handleShow}>
-              <i className="bi bi-plus-circle"></i> Add
-            </Button>
-
-            <Modal
-              show={show}
-              onHide={handleClose}
-              backdrop="static"
-              keyboard={false}
-              centered
-            >
-              <form
-                onSubmit={handleSubmit}
-                className="needs-validation"
-                noValidate
-              >
-                <Modal.Header closeButton>
-                  <Modal.Title>{modelTitle}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                  <div className="mb-3">
-                    <label htmlFor="facultyName" className="form-label">
-                      Name of Faculty
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${
-                        error.name ? "is-invalid" : ""
-                      }`}
-                      id="facultyName"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                    />
-                    <div className="invalid-feedback">{error.name}</div>
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="facultyDescription" className="form-label">
-                      Description
-                    </label>
-                    <textarea
-                      type="text"
-                      className={`form-control ${
-                        error.description ? "is-invalid" : ""
-                      }`}
-                      id="facultyDescription"
-                      name="description"
-                      rows={4}
-                      value={formData.description}
-                      onChange={handleChange}
-                    />
-                    <div className="invalid-feedback">{error.description}</div>
-                  </div>
-                </Modal.Body>
-                <Modal.Footer>
-                  <Button variant="secondary" onClick={handleClose}>
-                    Close
-                  </Button>
-                  <Button variant="warning" type="submit" disabled={isLoading}>
-                    {isLoading ? (
-                      <Spinner animation="border" variant="dark" />
-                    ) : (
-                      "Submit"
-                    )}
-                  </Button>
-                </Modal.Footer>
-              </form>
-            </Modal>
+          <div>
+            <input
+              className="form-control me-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+              onChange={handleSearch}
+            />
           </div>
+          <Button variant="warning" onClick={handleShow}>
+            <i className="bi bi-plus-circle"></i> Add
+          </Button>
+
+          <Modal
+            show={show}
+            onHide={handleClose}
+            backdrop="static"
+            keyboard={false}
+            centered
+          >
+            <form
+              onSubmit={handleSubmit}
+              className="needs-validation"
+              noValidate
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>{modelTitle}</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <div className="mb-3">
+                  <label htmlFor="facultyName" className="form-label">
+                    Name of Faculty
+                  </label>
+                  <input
+                    type="text"
+                    className={`form-control ${error.name ? "is-invalid" : ""}`}
+                    id="facultyName"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                  />
+                  <div className="invalid-feedback">{error.name}</div>
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="facultyDescription" className="form-label">
+                    Description
+                  </label>
+                  <textarea
+                    type="text"
+                    className={`form-control ${
+                      error.description ? "is-invalid" : ""
+                    }`}
+                    id="facultyDescription"
+                    name="description"
+                    rows={4}
+                    value={formData.description}
+                    onChange={handleChange}
+                  />
+                  <div className="invalid-feedback">{error.description}</div>
+                </div>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                  Close
+                </Button>
+                <Button variant="warning" type="submit" disabled={isLoading}>
+                  {isLoading ? (
+                    <Spinner animation="border" variant="dark" />
+                  ) : (
+                    "Submit"
+                  )}
+                </Button>
+              </Modal.Footer>
+            </form>
+          </Modal>
         </nav>
         <Table striped bordered hover responsive>
           <thead>
@@ -236,27 +239,53 @@ const FacultyPage = () => {
             </tr>
           </thead>
           <tbody>
-            {faculties.map((faculty, index) => (
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{faculty.name}</td>
-                <td>{faculty.description}</td>
-                <td className="d-flex flex-wrap gap-2">
-                  <Button
-                    variant="outline-warning"
-                    onClick={() => showEdit(faculty.facultyId)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="danger"
-                    onClick={() => handleRemove(faculty.facultyId)}
-                  >
-                    Delete
-                  </Button>
-                </td>
-              </tr>
-            ))}
+            {search.length > 0
+              ? search.map((faculty, index) => (
+                  <tr key={index}>
+                    <td className="col">{index + 1}</td>
+                    <td className="col-2">{faculty.name}</td>
+                    <td className="col-8">{faculty.description}</td>
+                    <td className="col">
+                      <div className="d-flex flex-wrap gap-2">
+                        <Button
+                          variant="outline-warning"
+                          onClick={() => showEdit(faculty.facultyId)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="danger"
+                          onClick={() => handleRemove(faculty.facultyId)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              : faculties.map((faculty, index) => (
+                  <tr key={index}>
+                    <td className="col">{index + 1}</td>
+                    <td className="col-2">{faculty.name}</td>
+                    <td className="col-8">{faculty.description}</td>
+                    <td className="col">
+                      <div className="d-flex flex-wrap gap-2">
+                        <Button
+                          variant="outline-warning"
+                          onClick={() => showEdit(faculty.facultyId)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="danger"
+                          onClick={() => handleRemove(faculty.facultyId)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
           </tbody>
         </Table>
       </AdminLayout>

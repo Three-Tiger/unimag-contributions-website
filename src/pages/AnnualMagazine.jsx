@@ -20,7 +20,8 @@ const AnnualMagazinePage = () => {
   ];
   const [isLoading, setIsLoading] = useState(false);
   const [annualMagazines, setAnnualMagazine] = useState([]);
-  const [modelTitle, setModelTitle] = useState("Add new Faculty");
+  const [search, setSearch] = useState([]);
+  const [modelTitle, setModelTitle] = useState("Add new Annual Magazine");
   const [show, setShow] = useState(false);
   const [formData, setFormData] = useState({
     annualMagazineId: "",
@@ -105,6 +106,16 @@ const AnnualMagazinePage = () => {
     });
   };
 
+  const handleSearch = (event) => {
+    const { value } = event.target;
+    const filter = annualMagazines.filter((annualMagazine) => {
+      return annualMagazine.academicYear
+        .toLowerCase()
+        .includes(value.toLowerCase());
+    });
+    setSearch(filter);
+  };
+
   // Form
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -171,137 +182,133 @@ const AnnualMagazinePage = () => {
       <AdminLayout>
         <h3 className="text-center fw-bold">Annual Magazine Management</h3>
         <nav className="navbar navbar-light bg-light mb-2">
-          <div className="container-fluid">
-            <form className="d-flex">
-              <input
-                className="form-control me-2"
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
-              />
-              <Button variant="outline-warning" type="submit">
-                Search
-              </Button>
-            </form>
-            <Button variant="warning" onClick={handleShow}>
-              <i className="bi bi-plus-circle"></i> Add
-            </Button>
-
-            <Modal
-              show={show}
-              onHide={handleClose}
-              backdrop="static"
-              keyboard={false}
-              centered
-            >
-              <form onSubmit={handleSubmit}>
-                <Modal.Header closeButton>
-                  <Modal.Title>{modelTitle}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                  <div className="mb-3">
-                    <label htmlFor="academicYear" className="form-label">
-                      Academic Year
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${
-                        error.academicYear ? "is-invalid" : ""
-                      }`}
-                      id="academicYear"
-                      name="academicYear"
-                      value={formData.academicYear}
-                      onChange={handleChange}
-                    />
-                    <div className="invalid-feedback">{error.academicYear}</div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label htmlFor="title" className="form-label">
-                      Title
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${
-                        error.title ? "is-invalid" : ""
-                      }`}
-                      id="title"
-                      name="title"
-                      value={formData.title}
-                      onChange={handleChange}
-                    />
-                    <div className="invalid-feedback">{error.title}</div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label htmlFor="description" className="form-label">
-                      Description
-                    </label>
-                    <textarea
-                      type="text"
-                      className={`form-control ${
-                        error.description ? "is-invalid" : ""
-                      }`}
-                      id="description"
-                      name="description"
-                      rows={4}
-                      value={formData.description}
-                      onChange={handleChange}
-                    />
-                    <div className="invalid-feedback">{error.description}</div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label htmlFor="closureDate" className="form-label">
-                      Closure Date
-                    </label>
-                    <input
-                      type="datetime-local"
-                      className={`form-control ${
-                        error.closureDate ? "is-invalid" : ""
-                      }`}
-                      id="closureDate"
-                      name="closureDate"
-                      value={formData.closureDate}
-                      onChange={handleChange}
-                    />
-                    <div className="invalid-feedback">{error.closureDate}</div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label htmlFor="finalClosureDate" className="form-label">
-                      Final Closure Date
-                    </label>
-                    <input
-                      type="datetime-local"
-                      className={`form-control ${
-                        error.finalClosureDate ? "is-invalid" : ""
-                      }`}
-                      id="finalClosureDate"
-                      name="finalClosureDate"
-                      value={formData.finalClosureDate}
-                      onChange={handleChange}
-                    />
-                    <div className="invalid-feedback">
-                      {error.finalClosureDate}
-                    </div>
-                  </div>
-                </Modal.Body>
-                <Modal.Footer>
-                  <Button variant="secondary" onClick={handleClose}>
-                    Close
-                  </Button>
-                  <Button variant="warning" type="submit" disabled={isLoading}>
-                    {isLoading ? (
-                      <Spinner animation="border" variant="dark" />
-                    ) : (
-                      "Submit"
-                    )}
-                  </Button>
-                </Modal.Footer>
-              </form>
-            </Modal>
+          <div>
+            <input
+              className="form-control me-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+              onChange={handleSearch}
+            />
           </div>
+          <Button variant="warning" onClick={handleShow}>
+            <i className="bi bi-plus-circle"></i> Add
+          </Button>
+
+          <Modal
+            show={show}
+            onHide={handleClose}
+            backdrop="static"
+            keyboard={false}
+            centered
+          >
+            <form onSubmit={handleSubmit}>
+              <Modal.Header closeButton>
+                <Modal.Title>{modelTitle}</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <div className="mb-3">
+                  <label htmlFor="academicYear" className="form-label">
+                    Academic Year
+                  </label>
+                  <input
+                    type="text"
+                    className={`form-control ${
+                      error.academicYear ? "is-invalid" : ""
+                    }`}
+                    id="academicYear"
+                    name="academicYear"
+                    value={formData.academicYear}
+                    onChange={handleChange}
+                  />
+                  <div className="invalid-feedback">{error.academicYear}</div>
+                </div>
+
+                <div className="mb-3">
+                  <label htmlFor="title" className="form-label">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    className={`form-control ${
+                      error.title ? "is-invalid" : ""
+                    }`}
+                    id="title"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                  />
+                  <div className="invalid-feedback">{error.title}</div>
+                </div>
+
+                <div className="mb-3">
+                  <label htmlFor="description" className="form-label">
+                    Description
+                  </label>
+                  <textarea
+                    type="text"
+                    className={`form-control ${
+                      error.description ? "is-invalid" : ""
+                    }`}
+                    id="description"
+                    name="description"
+                    rows={4}
+                    value={formData.description}
+                    onChange={handleChange}
+                  />
+                  <div className="invalid-feedback">{error.description}</div>
+                </div>
+
+                <div className="mb-3">
+                  <label htmlFor="closureDate" className="form-label">
+                    Closure Date
+                  </label>
+                  <input
+                    type="datetime-local"
+                    className={`form-control ${
+                      error.closureDate ? "is-invalid" : ""
+                    }`}
+                    id="closureDate"
+                    name="closureDate"
+                    value={formData.closureDate}
+                    onChange={handleChange}
+                  />
+                  <div className="invalid-feedback">{error.closureDate}</div>
+                </div>
+
+                <div className="mb-3">
+                  <label htmlFor="finalClosureDate" className="form-label">
+                    Final Closure Date
+                  </label>
+                  <input
+                    type="datetime-local"
+                    className={`form-control ${
+                      error.finalClosureDate ? "is-invalid" : ""
+                    }`}
+                    id="finalClosureDate"
+                    name="finalClosureDate"
+                    value={formData.finalClosureDate}
+                    onChange={handleChange}
+                  />
+                  <div className="invalid-feedback">
+                    {error.finalClosureDate}
+                  </div>
+                </div>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                  Close
+                </Button>
+                <Button variant="warning" type="submit" disabled={isLoading}>
+                  {isLoading ? (
+                    <Spinner animation="border" variant="dark" />
+                  ) : (
+                    "Submit"
+                  )}
+                </Button>
+              </Modal.Footer>
+            </form>
+          </Modal>
         </nav>
         <Table striped bordered hover responsive>
           <thead>
@@ -312,38 +319,83 @@ const AnnualMagazinePage = () => {
             </tr>
           </thead>
           <tbody>
-            {annualMagazines.map((annualMagazine, index) => (
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{annualMagazine.academicYear}</td>
-                <td>{annualMagazine.title}</td>
-                <td>{annualMagazine.description}</td>
-                <td>
-                  {formatDateTime.toDateTimeString(annualMagazine.closureDate)}
-                </td>
-                <td>
-                  {formatDateTime.toDateTimeString(
-                    annualMagazine.finalClosureDate
-                  )}
-                </td>
-                <td className="d-flex flex-wrap gap-2">
-                  <Button
-                    variant="outline-warning"
-                    onClick={() => showEdit(annualMagazine.annualMagazineId)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="danger"
-                    onClick={() =>
-                      handleRemove(annualMagazine.annualMagazineId)
-                    }
-                  >
-                    Delete
-                  </Button>
-                </td>
-              </tr>
-            ))}
+            {search.length > 0
+              ? search.map((annualMagazine, index) => (
+                  <tr key={index}>
+                    <td className="col">{index + 1}</td>
+                    <td className="col-1">{annualMagazine.academicYear}</td>
+                    <td className="col-2">{annualMagazine.title}</td>
+                    <td className="col-4">{annualMagazine.description}</td>
+                    <td className="col">
+                      {formatDateTime.toDateTimeString(
+                        annualMagazine.closureDate
+                      )}
+                    </td>
+                    <td className="col">
+                      {formatDateTime.toDateTimeString(
+                        annualMagazine.finalClosureDate
+                      )}
+                    </td>
+                    <td className="col">
+                      <div className="d-flex flex-wrap gap-2">
+                        <Button
+                          variant="outline-warning"
+                          onClick={() =>
+                            showEdit(annualMagazine.annualMagazineId)
+                          }
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="danger"
+                          onClick={() =>
+                            handleRemove(annualMagazine.annualMagazineId)
+                          }
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              : annualMagazines.map((annualMagazine, index) => (
+                  <tr key={index}>
+                    <td className="col">{index + 1}</td>
+                    <td className="col-1">{annualMagazine.academicYear}</td>
+                    <td className="col-2">{annualMagazine.title}</td>
+                    <td className="col-4">{annualMagazine.description}</td>
+                    <td className="col">
+                      {formatDateTime.toDateTimeString(
+                        annualMagazine.closureDate
+                      )}
+                    </td>
+                    <td className="col">
+                      {formatDateTime.toDateTimeString(
+                        annualMagazine.finalClosureDate
+                      )}
+                    </td>
+                    <td className="col">
+                      <div className="d-flex flex-wrap gap-2">
+                        <Button
+                          variant="outline-warning"
+                          onClick={() =>
+                            showEdit(annualMagazine.annualMagazineId)
+                          }
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="danger"
+                          onClick={() =>
+                            handleRemove(annualMagazine.annualMagazineId)
+                          }
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
           </tbody>
         </Table>
       </AdminLayout>
