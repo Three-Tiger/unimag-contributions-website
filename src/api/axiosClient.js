@@ -24,7 +24,7 @@ axiosClient.interceptors.request.use(
 
         const token = authService.getAccessToken();
         if (!noAuthList.includes(config.url) && token) {
-            config.headers.Authorization = `Bearer ${token}`;
+            config.headers['Authorization'] = `Bearer ${token}`;
         }
 
         return config;
@@ -41,19 +41,6 @@ axiosClient.interceptors.response.use(
         return response.data;
     },
     function (error) {
-        /// Logout if the token has expired
-        if (error.response && error.response.status === 401) {
-            if (authService.isLogin()) {
-                storageService.clear();
-                swalService.showMessageToHandle(
-                    'Session Expired',
-                    'Your session has expired. Please login again.',
-                    'error',
-                    () => logout.bind(this)
-                );
-            }
-        }
-
         return Promise.reject(error);
     }
 );

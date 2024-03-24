@@ -1,7 +1,11 @@
+import { useNavigate } from "react-router";
+import authService from "./AuthService";
 import swalService from "./SwalService";
 
 class HandleError {
     showError(error) {
+        const navigate = useNavigate();
+
         switch (error.response.status) {
             case 400:
                 swalService.showMessage(
@@ -11,10 +15,14 @@ class HandleError {
                 );
                 break;
             case 401:
-                swalService.showMessage(
+                swalService.showMessageToHandle(
                     "Warning",
                     error.response.data.message || "Please login to continue.",
-                    "warning"
+                    "warning",
+                    () => {
+                        authService.logout()
+                        navigate("/login")
+                    }
                 );
                 break;
             case 403:

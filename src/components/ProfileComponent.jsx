@@ -1,5 +1,4 @@
 import { Button, Container } from "react-bootstrap";
-import FullLayout from "../components/layouts/Full";
 import { useEffect, useState } from "react";
 import userApi from "../api/userApi";
 import handleError from "../services/HandleErrors";
@@ -87,6 +86,25 @@ const ProfileComponent = () => {
     });
   };
 
+  const removeProfile = () => {
+    if (user.profilePicture) {
+      swalService.confirmDelete(async () => {
+        try {
+          const response = await userApi.removeProfilePicture(user.userId);
+          storageService.save("USER_DATA", response);
+          setFormData({
+            ...formData,
+            profilePicture: null,
+            newProfilePicture: null,
+          });
+          setPreviewImage("/image/default-avatar.png");
+        } catch {
+          handleError.showError(error);
+        }
+      });
+    }
+  };
+
   // Form update profile
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -104,6 +122,7 @@ const ProfileComponent = () => {
         formDataSubmit.append("profilePicture", formData.profilePicture);
         formDataSubmit.append("facultyId", formData.facultyId);
         formDataSubmit.append("newProfilePicture", formData.newProfilePicture);
+        formDataSubmit.append("roleId", user.role.roleId);
 
         const userId = authService.getUserData().userId;
         const response = await userApi.updateProfile(userId, formDataSubmit);
@@ -321,7 +340,7 @@ const ProfileComponent = () => {
                                 accept="image/*"
                                 onChange={handleImageChange}
                               />
-                              <Button variant="danger">
+                              <Button variant="danger" onClick={removeProfile}>
                                 <i className="bi bi-trash"></i>
                               </Button>
                             </div>
@@ -575,7 +594,7 @@ const ProfileComponent = () => {
                         </div>
 
                         <div className="text-center">
-                          <button type="submit" className="btn btn-primary">
+                          <button type="submit" className="btn btn-warning">
                             Change Password
                           </button>
                         </div>

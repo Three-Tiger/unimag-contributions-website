@@ -45,6 +45,11 @@ class UserApi {
         const url = `/api/users/${userId}`;
         return axiosClient.delete(url);
     }
+
+    removeProfilePicture(userId) {
+        const url = `/api/users/${userId}/profile-picture`;
+        return axiosClient.put(url);
+    }
 }
 
 const userApi = new UserApi();
