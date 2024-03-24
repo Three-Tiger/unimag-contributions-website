@@ -1,8 +1,8 @@
 import axios from "axios";
 import { noAuthList } from "./noAuthList";
-import authService from "../services/AuthService";
 import storageService from "../services/StorageService";
 import swalService from "../services/SwalService";
+import authService from "../services/AuthService";
 
 const axiosClient = axios.create();
 
