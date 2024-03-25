@@ -7,6 +7,7 @@ import feedbackApi from "../api/feedbackApi";
 import authService from "../services/AuthService";
 import fileDetailApi from "../api/fileDetailApi";
 import swalService from "../services/SwalService";
+import Pusher from "pusher-js";
 
 const ContributionComponent = ({ annualMagazine }) => {
   const isClosed = new Date(annualMagazine.closureDate) < new Date();
@@ -242,11 +243,7 @@ const ContributionComponent = ({ annualMagazine }) => {
         contributionId: contribution.contributionId,
       };
 
-      const response = await feedbackApi.save(feedbackData);
-
-      const newContribution = { ...contribution };
-      newContribution.feedbacks.push(response);
-      setContribution(newContribution);
+      await feedbackApi.save(feedbackData);
 
       // Clear content
       setFormData({ ...formData, content: "" });
@@ -270,7 +267,27 @@ const ContributionComponent = ({ annualMagazine }) => {
       }
     };
 
-    fetchData();
+    const initializePusher = () => {
+      // Enable pusher logging - don't include this in production
+      Pusher.logToConsole = true;
+
+      const pusher = new Pusher("225d52aa0ca3ec6aaebe", {
+        cluster: "ap1",
+      });
+
+      const channel = pusher.subscribe("unimag-chat");
+      channel.bind("message", async function (data) {
+        const response = await contributionApi.getById(data.contributionId);
+        setContribution(response);
+      });
+    };
+
+    const fetchDataAndInitializePusher = async () => {
+      await fetchData();
+      initializePusher();
+    };
+
+    fetchDataAndInitializePusher();
   }, []);
 
   return (

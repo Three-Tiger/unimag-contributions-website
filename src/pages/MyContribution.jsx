@@ -64,6 +64,7 @@ const MyContributionPage = () => {
     <>
       <FullLayout>
         <Container>
+          <h2 className="text-center fw-bold mb-4">My Contribution</h2>
           <Modal
             size="lg"
             show={show}

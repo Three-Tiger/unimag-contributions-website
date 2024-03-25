@@ -8,9 +8,9 @@ import * as yup from "yup";
 import fileDetailApi from "../api/fileDetailApi";
 import imageDetailApi from "../api/imageDetailApi";
 import swalService from "../services/SwalService";
-import TextToHtmlConverter from "./TextToHtmlConverter";
 import emailApi from "../api/emailApi";
 import feedbackApi from "../api/feedbackApi";
+import Pusher from "pusher-js";
 
 const SubmissionComponent = ({ annualMagazine }) => {
   const isClosed = new Date(annualMagazine.closureDate) < new Date();
@@ -165,11 +165,7 @@ const SubmissionComponent = ({ annualMagazine }) => {
       contributionId: contribution.contributionId,
     };
 
-    const response = await feedbackApi.save(feedbackData);
-
-    const newContribution = { ...contribution };
-    newContribution.feedbacks.push(response);
-    setContribution(newContribution);
+    await feedbackApi.save(feedbackData);
 
     event.target[0].value = "";
   };
@@ -337,12 +333,31 @@ const SubmissionComponent = ({ annualMagazine }) => {
           );
         setContribution(response);
       } catch (error) {
-        console.log("🚀 ~ fetchData ~ error:", error);
-        // handleError.showError(error);
+        // console.log("🚀 ~ fetchData ~ error:", error);
+        handleError.showError(error);
       }
     };
 
-    fetchData();
+    const initializePusher = () => {
+      // Enable pusher logging - don't include this in production
+      Pusher.logToConsole = true;
+
+      const pusher = new Pusher("225d52aa0ca3ec6aaebe", {
+        cluster: "ap1",
+      });
+
+      const channel = pusher.subscribe("unimag-chat");
+      channel.bind("message", async function (data) {
+        await fetchData();
+      });
+    };
+
+    const fetchDataAndInitializePusher = async () => {
+      await fetchData();
+      initializePusher();
+    };
+
+    fetchDataAndInitializePusher();
   }, []);
 
   return (

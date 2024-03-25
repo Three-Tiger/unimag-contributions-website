@@ -37,10 +37,13 @@ const AdminLayout = ({ children }) => {
         className="header fixed-top d-flex align-items-center"
       >
         <div className="d-flex align-items-center justify-content-between">
-          <a href="index.html" className="logo d-flex align-items-center">
+          <Link
+            to="/admin/dashboard"
+            className="logo d-flex align-items-center"
+          >
             <img src="/image/logo.png" alt="" />
             <span className="d-none d-lg-block">Unimag</span>
-          </a>
+          </Link>
           <i
             className="bi bi-list toggle-sidebar-btn"
             onClick={toggleSidebar}
