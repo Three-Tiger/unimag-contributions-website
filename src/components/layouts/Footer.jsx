@@ -4,7 +4,7 @@ import { Button, Col, Container, Row } from "react-bootstrap";
 
 const Footer = () => {
   return (
-    <footer className="bg-light">
+    <footer className="bg-warning mx-3">
       <Container>
         <Row
           xs={1}
@@ -121,7 +121,7 @@ const Footer = () => {
             </ul>
           </Col>
         </Row>
-        <p className="text-center text-body-secondary">
+        <p className="text-center text-body-secondary mb-0 pb-4">
           © 2024 Unimang Contributions, Inc
         </p>
       </Container>

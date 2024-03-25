@@ -2,6 +2,8 @@ import ReactApexChart from "react-apexcharts";
 import statisticApi from "../../api/statisticApi";
 import { useEffect, useState } from "react";
 import handleError from "../../services/HandleErrors";
+import NoData from "/gif/no_data.gif";
+import { Image } from "react-bootstrap";
 
 const AcceptanceRejectionRatePie = () => {
   const [series, setSeries] = useState([]);
@@ -51,12 +53,18 @@ const AcceptanceRejectionRatePie = () => {
 
   return (
     <div>
-      <ReactApexChart
-        options={state.options}
-        series={state.series}
-        type="pie"
-        width={355}
-      />
+      {series[0] === 0 && series[1] === 0 && series[2] === 0 ? (
+        <div className="text-center">
+          <Image src={NoData} alt="No data" height={215} />
+        </div>
+      ) : (
+        <ReactApexChart
+          options={state.options}
+          series={state.series}
+          type="pie"
+          width={355}
+        />
+      )}
     </div>
   );
 };

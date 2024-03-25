@@ -7,8 +7,19 @@ import AdminLayout from "../components/layouts/Admin";
 import handleError from "../services/HandleErrors";
 import statisticApi from "../api/statisticApi";
 import formatDateTime from "../services/FormatDateTime";
+import NoData from "/gif/no_data.gif";
+import { Image } from "react-bootstrap";
 
 const DashboardPage = () => {
+  const row = [
+    "Title",
+    "Submission Date",
+    "Email",
+    "Full name",
+    "Avatar",
+    "Faculty",
+    "Status",
+  ];
   const [recentContributions, setRecentContributions] = useState([]);
 
   useEffect(() => {
@@ -76,16 +87,26 @@ const DashboardPage = () => {
             <table className="table table-borderless datatable">
               <thead>
                 <tr>
-                  <th scope="col">Title</th>
-                  <th scope="col">Submission Date</th>
-                  <th scope="col">Email</th>
-                  <th scope="col">Full name</th>
-                  <th scope="col">Avatar</th>
-                  <th scope="col">Faculty</th>
-                  <th scope="col">Status</th>
+                  {row.map((item, index) => (
+                    <th scope="col" key={index}>
+                      {item}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
+                {recentContributions.length === 0 && (
+                  <tr>
+                    <td colSpan={row.length} className="text-center py-4">
+                      <Image
+                        src={NoData}
+                        alt="No data"
+                        width={300}
+                        className="my-5 py-5"
+                      />
+                    </td>
+                  </tr>
+                )}
                 {recentContributions.map((contribution, index) => (
                   <tr key={index} className="align-middle">
                     <td>{contribution.title}</td>

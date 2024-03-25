@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "../components/layouts/Admin";
 import * as yup from "yup";
-import { Button, Modal, Spinner, Table } from "react-bootstrap";
+import { Button, Image, Modal, Spinner, Table } from "react-bootstrap";
 import facultyApi from "../api/facultyApi";
 import swalService from "../services/SwalService";
 import handleError from "../services/HandleErrors";
 import userApi from "../api/userApi";
 import roleApi from "../api/roleApi";
 import formatDateTime from "../services/FormatDateTime";
+import NoData from "/gif/no_data.gif";
 
 const UserPage = () => {
   const row = [
@@ -499,6 +500,18 @@ const UserPage = () => {
             </tr>
           </thead>
           <tbody>
+            {users.length === 0 && (
+              <tr>
+                <td colSpan={row.length} className="text-center py-4">
+                  <Image
+                    src={NoData}
+                    alt="No data"
+                    width={300}
+                    className="my-5 py-5"
+                  />
+                </td>
+              </tr>
+            )}
             {search.length > 0
               ? search.map((user, index) => (
                   <tr key={index}>
