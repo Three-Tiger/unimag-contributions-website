@@ -6,10 +6,6 @@ import authService from "../services/AuthService";
 
 const axiosClient = axios.create();
 
-function logout() {
-    authService.logout();
-}
-
 // Interceptors
 // Add a request interceptor
 axiosClient.interceptors.request.use(
@@ -41,6 +37,19 @@ axiosClient.interceptors.response.use(
         return response.data;
     },
     function (error) {
+        /// Logout if the token has expired
+        if (error.response && error.response.status === 401) {
+            if (authService.isLogin()) {
+                storageService.clear();
+                swalService.showMessageToHandle(
+                    'Session Expired',
+                    'Your session has expired. Please login again.',
+                    'error',
+                    () => authService.logout()
+                );
+            }
+        }
+
         return Promise.reject(error);
     }
 );
