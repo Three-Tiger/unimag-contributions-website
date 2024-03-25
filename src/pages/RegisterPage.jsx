@@ -32,6 +32,7 @@ function RegisterPage() {
     address: "",
     profilePicture: null,
     facultyId: "",
+    termAndCondition: false,
   });
   const [error, setError] = useState({});
   const [previewImage, setPreviewImage] = useState("/image/default-avatar.png");
@@ -53,9 +54,11 @@ function RegisterPage() {
       .matches(/^[0-9]{10}$/, "Phone number is not valid"),
     address: yup.string().required("Address is required"),
     facultyId: yup.string().required("Faculty is required"),
+    termAndCondition: yup.boolean().oneOf([true], "You must accept the terms"),
   });
 
   const handleChange = (event) => {
+    console.log("🚀 ~ handleChange ~ event:", event.target);
     const { name, value } = event.target;
     setFormData({
       ...formData,
@@ -75,6 +78,13 @@ function RegisterPage() {
     setFormData({
       ...formData,
       profilePicture: file,
+    });
+  };
+
+  const handleCheckboxChange = (event) => {
+    setFormData({
+      ...formData,
+      termAndCondition: event.target.checked,
     });
   };
 
@@ -98,12 +108,7 @@ function RegisterPage() {
         formDataSubmit.append("profilePicture", formData.profilePicture);
 
         await userApi.register(formDataSubmit);
-        swalService.showMessageToHandle(
-          "Success",
-          "Your account has been created successfully.",
-          "success",
-          () => navigate("/login")
-        );
+        navigate("/login");
       } catch (error) {
         handleError.showError(error);
       } finally {
@@ -297,12 +302,21 @@ function RegisterPage() {
                         </Form.Control.Feedback>
                       </Form.Group>
 
-                      <Form.Group className="mb-3">
-                        <Form.Check
+                      <Form.Check className="mb-3">
+                        <Form.Check.Input
                           type="checkbox"
-                          label="I agree to the conditions and regulations of UniMagContributions"
+                          name="termAndCondition"
+                          onChange={handleCheckboxChange}
+                          isInvalid={error.termAndCondition}
                         />
-                      </Form.Group>
+                        <Form.Check.Label>
+                          I agree to the conditions and regulations of
+                          UniMagContributions
+                        </Form.Check.Label>
+                        <Form.Control.Feedback type="invalid">
+                          {error.termAndCondition}
+                        </Form.Control.Feedback>
+                      </Form.Check>
 
                       <div className="d-grid">
                         <Button

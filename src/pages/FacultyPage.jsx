@@ -1,10 +1,11 @@
-import { Button, Modal, Spinner, Table } from "react-bootstrap";
+import { Button, Image, Modal, Spinner, Table } from "react-bootstrap";
 import AdminLayout from "../components/layouts/Admin";
 import { useEffect, useState } from "react";
 import * as yup from "yup";
 import facultyApi from "../api/facultyApi";
 import swalService from "../services/SwalService";
 import handleError from "../services/HandleErrors";
+import NoData from "/gif/no_data.gif";
 
 const FacultyPage = () => {
   const row = ["#", "Name", "Description", "Action"];
@@ -239,6 +240,18 @@ const FacultyPage = () => {
             </tr>
           </thead>
           <tbody>
+            {faculties.length === 0 && (
+              <tr>
+                <td colSpan={row.length} className="text-center py-4">
+                  <Image
+                    src={NoData}
+                    alt="No data"
+                    width={300}
+                    className="my-5 py-5"
+                  />
+                </td>
+              </tr>
+            )}
             {search.length > 0
               ? search.map((faculty, index) => (
                   <tr key={index}>

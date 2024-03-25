@@ -13,7 +13,29 @@ const AdminLayout = ({ children }) => {
   useEffect(() => {
     const user = authService.getUserData();
     setUserData(user);
+
+    // Check initial screen width
+    if (window.innerWidth < 1200) {
+      setIsSidebarOpen(false);
+    }
+
+    // Add event listener to check screen width on resize
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      // Clean up event listener
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
+
+  const handleResize = () => {
+    // Check screen width on resize
+    if (window.innerWidth < 1200) {
+      setIsSidebarOpen(false);
+    } else {
+      setIsSidebarOpen(true);
+    }
+  };
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);

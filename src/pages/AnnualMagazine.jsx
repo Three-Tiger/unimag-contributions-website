@@ -1,12 +1,12 @@
-import { Button, Modal, Spinner, Table } from "react-bootstrap";
+import { Button, Image, Modal, Spinner, Table } from "react-bootstrap";
 import AdminLayout from "../components/layouts/Admin";
 import { useEffect, useState } from "react";
-import { Form } from "react-router-dom";
 import * as yup from "yup";
 import swalService from "../services/SwalService";
 import annualMagazineApi from "../api/annualMagazine";
 import formatDateTime from "../services/FormatDateTime";
 import handleError from "../services/HandleErrors";
+import NoData from "/gif/no_data.gif";
 
 const AnnualMagazinePage = () => {
   const row = [
@@ -319,6 +319,18 @@ const AnnualMagazinePage = () => {
             </tr>
           </thead>
           <tbody>
+            {annualMagazines.length === 0 && (
+              <tr>
+                <td colSpan={row.length} className="text-center py-4">
+                  <Image
+                    src={NoData}
+                    alt="No data"
+                    width={300}
+                    className="my-5 py-5"
+                  />
+                </td>
+              </tr>
+            )}
             {search.length > 0
               ? search.map((annualMagazine, index) => (
                   <tr key={index}>

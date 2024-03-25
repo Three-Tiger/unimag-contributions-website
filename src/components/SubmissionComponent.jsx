@@ -331,9 +331,8 @@ const SubmissionComponent = ({ annualMagazine }) => {
             annualMagazine.annualMagazineId,
             user.userId
           );
-        setContribution(response);
+        setContribution(response || {});
       } catch (error) {
-        // console.log("🚀 ~ fetchData ~ error:", error);
         handleError.showError(error);
       }
     };
