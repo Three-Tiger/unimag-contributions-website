@@ -11,6 +11,7 @@ import swalService from "../services/SwalService";
 import emailApi from "../api/emailApi";
 import feedbackApi from "../api/feedbackApi";
 import Pusher from "pusher-js";
+import CountdownTimer from "./CountdownTimer";
 
 const SubmissionComponent = ({ annualMagazine }) => {
   const isClosed = new Date(annualMagazine.closureDate) < new Date();
@@ -415,12 +416,18 @@ const SubmissionComponent = ({ annualMagazine }) => {
                 <td className="fw-bold col-3">Time remaining</td>
                 <td>
                   <div>
+                    {/* <span className="fw-bold">Closure Date</span>:{" "}
+                    {timeRemainingClosureDate()} */}
                     <span className="fw-bold">Closure Date</span>:{" "}
-                    {timeRemainingClosureDate()}
+                    <CountdownTimer targetDate={annualMagazine.closureDate} />
                   </div>
                   <div>
+                    {/* <span className="fw-bold">Final Closure Date</span>:{" "}
+                    {timeRemainingFinalClosureDate()} */}
                     <span className="fw-bold">Final Closure Date</span>:{" "}
-                    {timeRemainingFinalClosureDate()}
+                    <CountdownTimer
+                      targetDate={annualMagazine.finalClosureDate}
+                    />
                   </div>
                 </td>
               </tr>

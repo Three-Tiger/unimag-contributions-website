@@ -23,7 +23,7 @@ const StudentProtected = ({ children }) => {
 
   swalService.showMessageToHandle(
     "Warning",
-    "Please login as a student to access this page.",
+    "Please login to continue.",
     "warning",
     () => navigate("/login")
   );

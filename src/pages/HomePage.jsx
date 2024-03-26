@@ -59,7 +59,7 @@ function HomePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await facultyApi.getAll();
+        const response = await facultyApi.getAll(6);
         setFaculties(response);
         const getPublished = await contributionApi.getPublished(6);
         setContributionsPublished(getPublished);
