@@ -215,7 +215,6 @@ const UserPage = () => {
           });
           handleClose();
         } catch (error) {
-          console.log("🚀 ~ handleSubmit ~ error:", error);
           handleError.showError(error);
         } finally {
           setIsLoading(false);
