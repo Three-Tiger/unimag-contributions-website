@@ -40,7 +40,10 @@ function RegisterPage() {
   // Yup validation
   const schema = yup.object().shape({
     email: yup.string().email().required("Email is required"),
-    password: yup.string().required("Password is required"),
+    password: yup
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .required("Password is required"),
     confirmPassword: yup
       .string()
       .required("Confirm Password is required")
@@ -108,6 +111,7 @@ function RegisterPage() {
         formDataSubmit.append("profilePicture", formData.profilePicture);
 
         await userApi.register(formDataSubmit);
+
         navigate("/login");
       } catch (error) {
         handleError.showError(error);

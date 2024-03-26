@@ -8,6 +8,7 @@ import authService from "../services/AuthService";
 import fileDetailApi from "../api/fileDetailApi";
 import swalService from "../services/SwalService";
 import Pusher from "pusher-js";
+import CountdownTimer from "./CountdownTimer";
 
 const ContributionComponent = ({ annualMagazine }) => {
   const isClosed = new Date(annualMagazine.closureDate) < new Date();
@@ -67,20 +68,12 @@ const ContributionComponent = ({ annualMagazine }) => {
     handleShow();
   };
 
-  const timeRemainingClosureDate = () => {
-    if (!isClosed) {
-      return formatDateTime.subtractDateTime(annualMagazine.closureDate);
-    }
-
-    return "The submission is closed";
-  };
-
-  const timeRemainingFinalClosureDate = () => {
-    if (!isFinalClosed) {
-      return formatDateTime.subtractDateTime(annualMagazine.finalClosureDate);
-    }
-
-    return "The submission is closed";
+  const feedbackRemainingDate = () => {
+    const finalClosureDate = new Date(annualMagazine.finalClosureDate);
+    const after14Days = new Date(
+      finalClosureDate.setDate(finalClosureDate.getDate() + 14)
+    );
+    return after14Days;
   };
 
   const isGraded = () => {
@@ -334,12 +327,18 @@ const ContributionComponent = ({ annualMagazine }) => {
                 <td className="fw-bold col-3">Time remaining</td>
                 <td>
                   <div>
+                    {/* <span className="fw-bold">Closure Date</span>:{" "}
+                    {timeRemainingClosureDate()} */}
                     <span className="fw-bold">Closure Date</span>:{" "}
-                    {timeRemainingClosureDate()}
+                    <CountdownTimer targetDate={annualMagazine.closureDate} />
                   </div>
                   <div>
+                    {/* <span className="fw-bold">Final Closure Date</span>:{" "}
+                    {timeRemainingFinalClosureDate()} */}
                     <span className="fw-bold">Final Closure Date</span>:{" "}
-                    {timeRemainingFinalClosureDate()}
+                    <CountdownTimer
+                      targetDate={annualMagazine.finalClosureDate}
+                    />
                   </div>
                 </td>
               </tr>
@@ -400,6 +399,12 @@ const ContributionComponent = ({ annualMagazine }) => {
                           />
                         ))}
                       </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="fw-bold col-3">Feedback remaining</td>
+                    <td>
+                      <CountdownTimer targetDate={feedbackRemainingDate()} />
                     </td>
                   </tr>
                 </>

@@ -1,9 +1,10 @@
 import axiosClient from "./axiosClient";
 
 class FacultyApi {
-    getAll = () => {
+    getAll = (limit) => {
         const url = "/api/faculties";
-        return axiosClient.get(url);
+        if (limit === undefined) return axiosClient.get(url);
+        return axiosClient.get(url, { params: { limit } });
     }
 
     GetOne = (id) => {
