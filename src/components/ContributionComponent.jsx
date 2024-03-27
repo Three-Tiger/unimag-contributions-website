@@ -10,6 +10,15 @@ import swalService from "../services/SwalService";
 import Pusher from "pusher-js";
 import CountdownTimer from "./CountdownTimer";
 
+const handleClose = () => {
+  setShow(false);
+  setError({});
+  setFormData({
+    facultyId: "",
+    name: "",
+    description: "",
+  });
+};
 const ContributionComponent = ({ annualMagazine }) => {
   const isClosed = new Date(annualMagazine.closureDate) < new Date();
   const isFinalClosed = new Date(annualMagazine.finalClosureDate) < new Date();
@@ -180,13 +189,14 @@ const ContributionComponent = ({ annualMagazine }) => {
       });
     });
 
-    swalService.showMessage(
+    swalService.showMessageToHandle(
       "Success",
       `You have set the publication status to ${
         formPublishData.isPublished ? "Published" : "Unreleased"
       }`,
       "success"
     );
+    handleClose();
   };
 
   const handleSubmit = async (event) => {
