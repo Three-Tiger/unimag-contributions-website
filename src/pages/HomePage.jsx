@@ -171,7 +171,11 @@ function HomePage() {
             {contributionsPublished.length === 0 ? (
               <div className="text-center">
                 {/* <h4>No articles found</h4> */}
-                <Image src={EmptyArticle} alt="Empty Article" />
+                <Image
+                  src={EmptyArticle}
+                  alt="Empty Article"
+                  className="img-fluid"
+                />
               </div>
             ) : (
               contributionsPublished.map((contribution, index) => (

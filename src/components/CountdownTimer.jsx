@@ -43,9 +43,7 @@ const CountdownTimer = ({ targetDate }) => {
   });
 
   return (
-    <div>
-      {timerComponents.length ? timerComponents : <span>Time's up!</span>}
-    </div>
+    <>{timerComponents.length ? timerComponents : <span>Time's up!</span>}</>
   );
 };
 
