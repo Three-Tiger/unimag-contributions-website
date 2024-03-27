@@ -16,6 +16,7 @@ import AdminProtected from "./components/layouts/AdminProtected.jsx";
 import StudentProtected from "./components/layouts/StudentProtected.jsx";
 import ArticleDetailPage from "./pages/ArticleDetailPage.jsx";
 import MyContributionPage from "./pages/MyContribution.jsx";
+import Protected from "./components/layouts/Protected.jsx";
 
 function App() {
   const router = useRoutes([
@@ -38,9 +39,9 @@ function App() {
     {
       path: "/profile",
       element: (
-        <StudentProtected>
+        <Protected>
           <ProfilePage />
-        </StudentProtected>
+        </Protected>
       ),
     },
     {

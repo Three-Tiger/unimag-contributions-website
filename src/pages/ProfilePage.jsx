@@ -14,14 +14,14 @@ const ProfilePage = () => {
 
   return (
     <>
-      {!isStudent() && !isGuest() ? (
-        <AdminLayout>
-          <ProfileComponent />
-        </AdminLayout>
-      ) : (
+      {isStudent() || isGuest() ? (
         <FullLayout>
           <ProfileComponent />
         </FullLayout>
+      ) : (
+        <AdminLayout>
+          <ProfileComponent />
+        </AdminLayout>
       )}
     </>
   );

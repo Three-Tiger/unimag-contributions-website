@@ -84,6 +84,17 @@ const ContributionComponent = ({ annualMagazine }) => {
     return authService.getUserData().role.name === "Manager";
   };
 
+  const downloadFile = async (fileId, fileName) => {
+    const response = await fileDetailApi.downloadFile(fileId);
+    generateDownloadLink(response, fileName);
+  };
+
+  const downloadContribution = async (contributionId, title) => {
+    const response = await fileDetailApi.downloadMultipleFile(contributionId);
+    const fileName = `${title}.zip`;
+    generateDownloadLink(response, fileName);
+  };
+
   const downloadAll = async () => {
     const listContributions = contributions.map((contribution) => {
       return contribution.contributionId;
@@ -91,13 +102,15 @@ const ContributionComponent = ({ annualMagazine }) => {
     const response = await fileDetailApi.downloadFileByListContributionId(
       listContributions
     );
-    const url = window.URL.createObjectURL(new Blob([response]));
+    const fileName = `all-contributions-${annualMagazine.academicYear}.zip`;
+    generateDownloadLink(response, fileName);
+  };
+
+  const generateDownloadLink = async (file, fileName) => {
+    const url = window.URL.createObjectURL(new Blob([file]));
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute(
-      "download",
-      `all-contributions-${annualMagazine.academicYear}.zip`
-    );
+    link.setAttribute("download", fileName);
     document.body.appendChild(link);
     link.click();
     link.parentNode.removeChild(link);
@@ -152,6 +165,19 @@ const ContributionComponent = ({ annualMagazine }) => {
 
   const handleSubmitPublish = async (event) => {
     event.preventDefault();
+
+    if (
+      (contribution.status == "Waiting" || contribution.status == "Rejected") &&
+      formPublishData.isPublished
+    ) {
+      swalService.showMessage(
+        "Warning",
+        "You can't publish this contribution because it's not approved",
+        "warning"
+      );
+      return;
+    }
+
     const contributionData = {
       contributionId: contribution.contributionId,
       title: contribution.title,
@@ -180,12 +206,13 @@ const ContributionComponent = ({ annualMagazine }) => {
       });
     });
 
-    swalService.showMessage(
+    swalService.showMessageToHandle(
       "Success",
       `You have set the publication status to ${
         formPublishData.isPublished ? "Published" : "Unreleased"
       }`,
-      "success"
+      "success",
+      () => handleClose()
     );
   };
 
@@ -365,8 +392,11 @@ const ContributionComponent = ({ annualMagazine }) => {
                           </h2>
                           <div>
                             <a
-                              href={`/api/file-details/${file.fileId}/download`}
+                              href="#"
                               key={index}
+                              onClick={() =>
+                                downloadFile(file.fileId, file.fileName)
+                              }
                             >
                               {file.fileName}
                             </a>
@@ -378,12 +408,17 @@ const ContributionComponent = ({ annualMagazine }) => {
                           </div>
                         </div>
                       ))}
-                      <a
-                        href={`/api/file-details/${contribution.contributionId}/download-multiple`}
-                        className="btn btn-outline-warning"
+                      <Button
+                        variant="outline-warning"
+                        onClick={() =>
+                          downloadContribution(
+                            contribution.contributionId,
+                            contribution.title
+                          )
+                        }
                       >
                         Download all
-                      </a>
+                      </Button>
                     </td>
                   </tr>
                   <tr>
@@ -401,12 +436,14 @@ const ContributionComponent = ({ annualMagazine }) => {
                       </div>
                     </td>
                   </tr>
-                  <tr>
-                    <td className="fw-bold col-3">Feedback remaining</td>
-                    <td>
-                      <CountdownTimer targetDate={feedbackRemainingDate()} />
-                    </td>
-                  </tr>
+                  {!isManager() && (
+                    <tr>
+                      <td className="fw-bold col-3">Feedback remaining</td>
+                      <td>
+                        <CountdownTimer targetDate={feedbackRemainingDate()} />
+                      </td>
+                    </tr>
+                  )}
                 </>
               )}
             </tbody>
@@ -414,7 +451,7 @@ const ContributionComponent = ({ annualMagazine }) => {
           <div className="my-5 py-5"></div>
           {isManager() ? (
             <div>
-              {contribution.feedbacks?.length > 0 && (
+              {contribution.feedbacks?.length > 0 ? (
                 <form onSubmit={handleSubmitPublish}>
                   <Table striped>
                     <tbody>
@@ -510,6 +547,12 @@ const ContributionComponent = ({ annualMagazine }) => {
                     </Button>
                   </div>
                 </form>
+              ) : (
+                <div className="text-center">
+                  <p className="text-danger">
+                    This contribution has not been graded yet
+                  </p>
+                </div>
               )}
             </div>
           ) : (
