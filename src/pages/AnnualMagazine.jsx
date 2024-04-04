@@ -90,12 +90,53 @@ const AnnualMagazinePage = () => {
   };
 
   // Yup validation
+  // const schema = yup.object().shape({
+  //   academicYear: yup.string().required("Academic Year is required"),
+  //   title: yup.string().required("Title is required"),
+  //   description: yup.string().required("Description is required"),
+  //   closureDate: yup.string().required("Closure Date is required"),
+  //   finalClosureDate: yup.string().required("Final Closure Date is required"),
+  // });
   const schema = yup.object().shape({
-    academicYear: yup.string().required("Academic Year is required"),
+    academicYear: yup
+      .string()
+      .required("Academic Year is required")
+      .matches(
+        /^\d{4}-\d{4}$/,
+        "Academic Year must be in the format 'YYYY-YYYY'"
+      )
+      .test({
+        name: "academic-year",
+        message:
+          'Academic Year must be in the format "YYYY-YYYY" and end year must be greater than start year',
+        test: function (academicYear) {
+          if (!academicYear) return false;
+
+          const [startYear, endYear] = academicYear.split("-").map(Number);
+          if (isNaN(startYear) || isNaN(endYear)) return false;
+
+          return endYear > startYear;
+        },
+      }),
     title: yup.string().required("Title is required"),
     description: yup.string().required("Description is required"),
     closureDate: yup.string().required("Closure Date is required"),
-    finalClosureDate: yup.string().required("Final Closure Date is required"),
+    finalClosureDate: yup
+      .string()
+      .required("Final Closure Date is required")
+      .test({
+        name: "final-closure-date",
+        message: "Final Closure Date must be larger than Closure Date",
+        test: function (finalClosureDate) {
+          const closureDate = this.parent.closureDate;
+          // Check if both dates are valid and if finalClosureDate is larger
+          return (
+            !!closureDate &&
+            !!finalClosureDate &&
+            new Date(finalClosureDate) > new Date(closureDate)
+          );
+        },
+      }),
   });
 
   const handleChange = (event) => {

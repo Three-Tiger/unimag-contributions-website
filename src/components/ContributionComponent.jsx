@@ -76,6 +76,10 @@ const ContributionComponent = ({ annualMagazine }) => {
     return after14Days;
   };
 
+  const isFeedbackExpired = () => {
+    return feedbackRemainingDate() < new Date();
+  };
+
   const isGraded = () => {
     return contribution.feedbacks?.length > 0;
   };
@@ -592,7 +596,7 @@ const ContributionComponent = ({ annualMagazine }) => {
                   ))}
                 <div ref={bottomOfChatRef}></div>
               </div>
-              <div className="mb-3">
+              <div className={`mb-3 ${isFeedbackExpired() && "d-none"}`}>
                 <label htmlFor="facultyName" className="form-label">
                   Your decision (choose one option)
                 </label>
@@ -649,7 +653,11 @@ const ContributionComponent = ({ annualMagazine }) => {
                   </label>
                 </div>
               </div>
-              <div className="input-group message-input">
+              <div
+                className={`input-group message-input ${
+                  isFeedbackExpired() && "d-none"
+                }`}
+              >
                 <textarea
                   className="form-control"
                   placeholder="Type your message..."
