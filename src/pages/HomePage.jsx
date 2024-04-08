@@ -74,9 +74,9 @@ function HomePage() {
   return (
     <FullLayout>
       {/* Hero Section */}
-      <section className="">
+      <section>
         <div className="px-4 py-5 my-5 text-center">
-          <div className="d-flex justify-content-center align-items-center gap-3 mb-4 mt-5">
+          <div className="d-flex flex-wrap justify-content-center align-items-center gap-3 mb-4 mt-5">
             <img src={Lightning} alt="Lightning" />
             <h1 className="display-5 fw-bold mb-0">
               <span className="text-warning">Unimag</span> Contributions
@@ -116,7 +116,7 @@ function HomePage() {
       {/* Faculty */}
       <section className="py-5 faculty">
         <Container>
-          <div className="d-flex justify-content-between align-items-center mb-5">
+          <div className="d-flex justify-content-between align-items-center mb-4">
             <h2 className="fw-bold mb-0">Faculty</h2>
             {/* <Link to="/faculty">
                 <Button variant="outline-warning">View All</Button>
@@ -127,12 +127,9 @@ function HomePage() {
               <Col md={6} lg={4} key={index}>
                 <Card className="mb-4">
                   <Card.Body>
-                    <Card.Title className="mb-4">
-                      <h3>{course.name}</h3>
-                    </Card.Title>
-                    <Card.Text>
-                      <h6 className="fw-bold">Description about this course</h6>
-                      <p className="description">{course.description}</p>
+                    <Card.Title className="fs-5">{course.name}</Card.Title>
+                    <Card.Text className="description">
+                      {course.description}
                     </Card.Text>
                     {/* <div className="text-end">
                         <Link to="/submition">
@@ -151,7 +148,7 @@ function HomePage() {
       {/* Student Article */}
       <section className="py-5 article">
         <Container>
-          <Row className="align-items-end mb-5">
+          <Row className="align-items-end mb-4">
             <Col md={10}>
               <h2 className="fw-bold">Students’ Articles </h2>
               <p className="mb-0">
@@ -185,32 +182,30 @@ function HomePage() {
                       variant="top"
                       src={`/api/contributions/${contribution.contributionId}/image`}
                       style={{
-                        height: "300px",
+                        height: "500px",
                         objectFit: "cover",
                         objectPosition: "center",
                       }}
                     />
                     <Card.Body>
-                      <Card.Text>
-                        <div className="d-flex justify-content-between align-items-center">
-                          <Badge bg="light" text="dark">
-                            <p className="p-2 mb-0">
-                              {formatDateTime.toDateString(
-                                contribution.submissionDate
-                              )}
-                            </p>
-                          </Badge>
-                          <h6 className="mb-0">
-                            By{" "}
-                            <span className="text-warning">
-                              {contribution.user.firstName}{" "}
-                              {contribution.user.lastName}
-                            </span>
-                          </h6>
-                        </div>
-                      </Card.Text>
-                      <Card.Title className="mb-2">
-                        <h5 className="fw-bold">{contribution.title}</h5>
+                      <div className="d-flex justify-content-between align-items-center mb-2">
+                        <Badge bg="light" text="dark">
+                          <p className="py-2 mb-0">
+                            {formatDateTime.toDateString(
+                              contribution.submissionDate
+                            )}
+                          </p>
+                        </Badge>
+                        <h6 className="mb-0">
+                          By{" "}
+                          <span className="text-warning">
+                            {contribution.user.firstName}{" "}
+                            {contribution.user.lastName}
+                          </span>
+                        </h6>
+                      </div>
+                      <Card.Title className="mb-2 fw-bold fs-5">
+                        {contribution.title}
                       </Card.Title>
                       {/* <Card.Text>
                         <p className="description">{article.description}</p>

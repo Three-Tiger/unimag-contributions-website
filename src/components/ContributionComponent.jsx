@@ -154,15 +154,18 @@ const ContributionComponent = ({ annualMagazine }) => {
     event.preventDefault();
     if (formFilterData.status || formFilterData.isPublished) {
       const response = await contributionApi.getContributionsByFilter({
+        facultyId: userData.faculty.facultyId,
         annualMagazineId: annualMagazine.annualMagazineId,
         status: formFilterData.status,
         isPublished: formFilterData.isPublished,
       });
       setContributions(response);
     } else {
-      const response = await contributionApi.getContributionsByAnnualMagazineId(
-        annualMagazine.annualMagazineId
-      );
+      const response =
+        await contributionApi.getContributionsByAnnualMagazineIdAndFacultyId(
+          annualMagazine.annualMagazineId,
+          userData.faculty.facultyId
+        );
       setContributions(response);
     }
   };

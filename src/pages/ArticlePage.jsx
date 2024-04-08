@@ -75,24 +75,22 @@ const ArticlePage = () => {
                   }}
                 />
                 <Card.Body>
-                  <Card.Text>
-                    <div className="d-flex justify-content-between align-items-center">
-                      <Badge bg="light" text="dark">
-                        <p className="p-2 mb-0">
-                          {formatDateTime.toDateString(
-                            contribution.submissionDate
-                          )}
-                        </p>
-                      </Badge>
-                      <h6 className="mb-0">
-                        By{" "}
-                        <span className="text-warning">
-                          {contribution.user.firstName}{" "}
-                          {contribution.user.lastName}
-                        </span>
-                      </h6>
-                    </div>
-                  </Card.Text>
+                  <div className="d-flex justify-content-between align-items-center mb-2">
+                    <Badge bg="light" text="dark">
+                      <p className="p-2 mb-0">
+                        {formatDateTime.toDateString(
+                          contribution.submissionDate
+                        )}
+                      </p>
+                    </Badge>
+                    <h6 className="mb-0">
+                      By{" "}
+                      <span className="text-warning">
+                        {contribution.user.firstName}{" "}
+                        {contribution.user.lastName}
+                      </span>
+                    </h6>
+                  </div>
                   <Card.Title className="mb-2">
                     <h5 className="fw-bold">{contribution.title}</h5>
                   </Card.Title>

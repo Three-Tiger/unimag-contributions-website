@@ -51,8 +51,8 @@ const AboutPage = () => {
           </Row>
 
           <Row className="mb-5 py-5">
-            {descrip.map((description) => (
-              <Row>
+            {descrip.map((description, index) => (
+              <Row key={index}>
                 <Card.Body>
                   <div className="mb-3">
                     <h4>{description.description}</h4>

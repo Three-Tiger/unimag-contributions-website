@@ -48,7 +48,7 @@ const Header = () => {
       <Container fluid>
         <Navbar expand="md" className="bg-body-tertiary mb-3">
           <Container>
-            <Navbar.Brand href="#">
+            <Navbar.Brand>
               <Link to="/">
                 <img
                   src={UniLogo}
