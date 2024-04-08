@@ -441,7 +441,10 @@ const SubmissionComponent = ({ annualMagazine }) => {
                     <td className="fw-bold col-3">File submissions</td>
                     <td>
                       {contribution.fileDetails.map((file, index) => (
-                        <div className="d-flex align-items-center gap-2 mb-3">
+                        <div
+                          className="d-flex align-items-center gap-2 mb-3"
+                          key={index}
+                        >
                           <h2 className="mb-0">
                             {file.fileType == "DOCX" ? (
                               <i className="bi bi-filetype-docx"></i>
@@ -578,7 +581,7 @@ const SubmissionComponent = ({ annualMagazine }) => {
                     {errorContribution.imageDetails}
                   </div>
                 </div>
-                <div class="form-check">
+                <div className="form-check">
                   <input
                     className={`form-check-input ${
                       errorContribution.termAndCondition ? "is-invalid" : ""
@@ -589,7 +592,7 @@ const SubmissionComponent = ({ annualMagazine }) => {
                     value=""
                     onChange={handleCheckboxChange}
                   />
-                  <label class="form-check-label" for="flexCheckDefault">
+                  <label className="form-check-label" for="flexCheckDefault">
                     I confirm that my article adheres to the submission
                     guidelines provided by the website, including specifications
                     on length, formatting, and content.{" "}
@@ -705,18 +708,18 @@ const SubmissionComponent = ({ annualMagazine }) => {
                   <tr>
                     <td className="fw-bold col-3">Feedback comment</td>
                     <td>
-                      <div class="container">
+                      <div className="container">
                         {contribution.feedbacks.map((feedback, index) => (
-                          <div class="chat-box" key={index}>
+                          <div className="chat-box" key={index}>
                             <div
-                              class={
+                              className={
                                 feedback.user.userId == userData.userId
                                   ? "user-message"
                                   : "other-message"
                               }
                             >
                               {feedback.user?.userId == userData.userId && (
-                                <div class="message">
+                                <div className="message">
                                   <pre>{feedback.content}</pre>
                                 </div>
                               )}
@@ -727,10 +730,10 @@ const SubmissionComponent = ({ annualMagazine }) => {
                                     : "/image/default-avatar.png"
                                 }
                                 alt="Avatar"
-                                class="avatar"
+                                className="avatar"
                               />
                               {feedback.user?.userId != userData.userId && (
-                                <div class="message">
+                                <div className="message">
                                   <pre>{feedback.content}</pre>
                                 </div>
                               )}
@@ -738,14 +741,14 @@ const SubmissionComponent = ({ annualMagazine }) => {
                           </div>
                         ))}
                         <form onSubmit={handleSendFeedback}>
-                          <div class="input-group message-input">
+                          <div className="input-group message-input">
                             <textarea
-                              class="form-control"
+                              className="form-control"
                               placeholder="Type your message..."
                               rows={3}
                             />
                             <div className="ms-2">
-                              <button class="btn btn-warning" type="submit">
+                              <button className="btn btn-warning" type="submit">
                                 Send
                               </button>
                             </div>

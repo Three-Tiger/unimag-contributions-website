@@ -1,65 +1,79 @@
 import { Link } from "react-router-dom";
 import authService from "../../services/AuthService";
+import { useEffect, useState } from "react";
 
 const SideBar = () => {
-  const isAdministrator = () => {
-    return authService.getUserData().role.name === "Administrator";
-  };
+  const [pages, setPages] = useState([
+    {
+      name: "Dashboard",
+      path: "/admin/dashboard",
+      icon: "bi bi-grid",
+      isActive: false,
+      roles: ["Coordinator", "Manager", "Administrator"],
+    },
+    {
+      name: "Faculty",
+      path: "/admin/faculty",
+      icon: "bi bi-person-workspace",
+      isActive: false,
+      role: "Administrator",
+    },
+    {
+      name: "Annual Magazine",
+      path: "/admin/annual-magazine",
+      icon: "bi bi-calendar",
+      isActive: false,
+      role: "Administrator",
+    },
+    {
+      name: "Student Submission",
+      path: "/admin/contribution",
+      icon: "bi bi-book",
+      isActive: false,
+      roles: ["Coordinator", "Manager"],
+    },
+    {
+      name: "User",
+      path: "/admin/user",
+      icon: "bi bi-person",
+      isActive: false,
+      role: "Administrator",
+    },
+  ]);
 
-  const isCoordinator = () => {
-    return authService.getUserData().role.name === "Coordinator";
-  };
-
-  const isManager = () => {
-    return authService.getUserData().role.name === "Manager";
-  };
+  useEffect(() => {
+    const path = window.location.pathname;
+    const newPages = pages.map((page) => {
+      if (path.includes(page.path)) {
+        page.isActive = true;
+      } else {
+        page.isActive = false;
+      }
+      return page;
+    });
+    setPages(newPages);
+  }, []);
 
   return (
     <aside id="sidebar" className="sidebar">
       <ul className="sidebar-nav" id="sidebar-nav">
-        <li className="nav-item">
-          <Link className="nav-link " to="/admin/dashboard">
-            <i className="bi bi-grid"></i>
-            <span>Dashboard</span>
-          </Link>
-        </li>
-
-        {isAdministrator() && (
-          <li className="nav-item">
-            <Link className="nav-link collapsed" to="/admin/faculty">
-              <i className="bi bi-person-workspace"></i>
-              <span>Faculty</span>
-            </Link>
-          </li>
-        )}
-
-        {isAdministrator() && (
-          <li className="nav-item">
-            <Link className="nav-link collapsed" to="/admin/annual-magazine">
-              <i className="bi bi-calendar"></i>
-              <span>Annual Magazine</span>
-            </Link>
-          </li>
-        )}
-
-        {(isCoordinator() || isManager()) && (
-          <li className="nav-item">
-            <Link className="nav-link collapsed" to="/admin/contribution">
-              <i className="bi bi-book"></i>
-              <span>
-                {isCoordinator() ? "Student Submission" : "Contribution List"}
-              </span>
-            </Link>
-          </li>
-        )}
-
-        {isAdministrator() && (
-          <li className="nav-item">
-            <Link className="nav-link collapsed" to="/admin/user">
-              <i className="bi bi-person"></i>
-              <span>User</span>
-            </Link>
-          </li>
+        {pages.map(
+          (page) =>
+            // Check if the user has the required role to view the page
+            ((page.role &&
+              authService.getUserData().role.name === "Administrator") ||
+              (page.roles &&
+                page.roles.includes(authService.getUserData().role.name))) && (
+              <li className="nav-item" key={page.name}>
+                <Link
+                  className={`nav-link ${!page.isActive ? "collapsed" : ""}`}
+                  to={page.path}
+                >
+                  <i className={page.icon}></i>
+                  <span>{page.name}</span>
+                </Link>
+              </li>
+            )
         )}
       </ul>
     </aside>

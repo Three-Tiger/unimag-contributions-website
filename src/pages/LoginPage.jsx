@@ -78,69 +78,61 @@ function LoginPage() {
                   <Card.Subtitle className="mb-2 text-center text-muted">
                     Welcome back! Please log in to access your account.
                   </Card.Subtitle>
-                  <Card.Text>
-                    <Form onSubmit={handleSubmit}>
-                      <Form.Group className="mb-3" controlId="formBasicEmail">
-                        <Form.Label>Email</Form.Label>
-                        <Form.Control
-                          type="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                        />
-                        <div className="invalid-feedback">
-                          {error.email ? error.email : ""}
-                        </div>
-                      </Form.Group>
-
-                      <Form.Group
-                        className="mb-3"
-                        controlId="formBasicPassword"
-                      >
-                        <Form.Label>Password</Form.Label>
-                        <Form.Control
-                          type="password"
-                          name="password"
-                          value={formData.password}
-                          onChange={handleChange}
-                        />
-                        <div className="invalid-feedback">
-                          {error.password ? error.password : ""}
-                        </div>
-                      </Form.Group>
-                      <Form.Group className="mb-3 text-end">
-                        <Form.Text className="text-muted">
-                          <Link to="#">Forgot password?</Link>
-                        </Form.Text>
-                      </Form.Group>
-
-                      <Form.Group
-                        className="mb-3"
-                        controlId="formBasicCheckbox"
-                      >
-                        <Form.Check type="checkbox" label="Rememeber me" />
-                      </Form.Group>
-                      <div className="d-grid">
-                        <Button
-                          variant="warning"
-                          type="submit"
-                          disabled={isLoading}
-                        >
-                          {isLoading ? (
-                            <Spinner animation="border" variant="dark" />
-                          ) : (
-                            "Login"
-                          )}
-                        </Button>
+                  <Form onSubmit={handleSubmit}>
+                    <Form.Group className="mb-3" controlId="formBasicEmail">
+                      <Form.Label>Email</Form.Label>
+                      <Form.Control
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                      />
+                      <div className="invalid-feedback">
+                        {error.email ? error.email : ""}
                       </div>
-                    </Form>
-                    <div className="mt-3 text-center">
-                      <div className="border-1">
-                        Don’t have an account?{" "}
-                        <Link to="/register">Sign Up</Link>
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="formBasicPassword">
+                      <Form.Label>Password</Form.Label>
+                      <Form.Control
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                      />
+                      <div className="invalid-feedback">
+                        {error.password ? error.password : ""}
                       </div>
+                    </Form.Group>
+                    <Form.Group className="mb-3 text-end">
+                      <Form.Text className="text-muted">
+                        <Link to="#">Forgot password?</Link>
+                      </Form.Text>
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="formBasicCheckbox">
+                      <Form.Check type="checkbox" label="Rememeber me" />
+                    </Form.Group>
+
+                    <div className="d-grid">
+                      <Button
+                        variant="warning"
+                        type="submit"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <Spinner animation="border" variant="dark" />
+                        ) : (
+                          "Login"
+                        )}
+                      </Button>
                     </div>
-                  </Card.Text>
+                  </Form>
+                  <div className="mt-3 text-center">
+                    <div className="border-1">
+                      Don’t have an account? <Link to="/register">Sign Up</Link>
+                    </div>
+                  </div>
                 </Card.Body>
               </Card>
             </Col>

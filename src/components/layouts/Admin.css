@@ -673,6 +673,7 @@ a:hover {
   align-items: center;
   font-size: 15px;
   font-weight: 600;
+  color: #ffca2c;
   transition: 0.3;
   background: #f6f9ff;
   padding: 10px 15px;
@@ -682,9 +683,11 @@ a:hover {
 .sidebar-nav .nav-link i {
   font-size: 16px;
   margin-right: 10px;
+  color: #ffca2c;
 }
 
 .sidebar-nav .nav-link.collapsed {
+  color: #899bbd;
   background: #fff;
 }
 
