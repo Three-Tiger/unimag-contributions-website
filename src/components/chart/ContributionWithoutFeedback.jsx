@@ -5,26 +5,22 @@ import handleError from "../../services/HandleErrors";
 import NoData from "/gif/no_data.gif";
 import { Image } from "react-bootstrap";
 
-const AcceptanceRejectionRatePie = ({ facultyId }) => {
+const ContributionWithoutFeedback = () => {
   const [series, setSeries] = useState([]);
   const [labels, setLabels] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        var params = null;
-        if (facultyId) {
-          params = { facultyId: facultyId };
-        }
+        const response = await statisticApi.getContributionWithoutComment();
 
-        const response = await statisticApi.acceptanceRejectionRate(params);
-        console.log("🚀 ~ fetchData ~ response:", response);
+        const contributionWithoutFeedback =
+          response.contributionWithoutFeedback;
+        const contributionWithFeedback =
+          response.totalContributions - contributionWithoutFeedback;
 
-        Object.keys(response).forEach((key) => {
-          if (labels.includes(key)) return;
-          setSeries((series) => [...series, response[key]]);
-          setLabels((labels) => [...labels, key]);
-        });
+        setSeries([contributionWithoutFeedback, contributionWithFeedback]);
+        setLabels(["Without feedback (articles)", "With feedback (articles)"]);
       } catch (error) {
         handleError.showError(error);
       }
@@ -68,11 +64,11 @@ const AcceptanceRejectionRatePie = ({ facultyId }) => {
           options={state.options}
           series={state.series}
           type="pie"
-          width={355}
+          width={450}
         />
       )}
     </div>
   );
 };
 
-export default AcceptanceRejectionRatePie;
+export default ContributionWithoutFeedback;

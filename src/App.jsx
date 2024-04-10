@@ -18,6 +18,7 @@ import ArticleDetailPage from "./pages/ArticleDetailPage.jsx";
 import MyContributionPage from "./pages/MyContribution.jsx";
 import Protected from "./components/layouts/Protected.jsx";
 import SubmissionDetailPage from "./pages/SubmissionDetailPage.jsx";
+import GuestStatisticPage from "./pages/GuestStatisticPage.jsx";
 
 function App() {
   const router = useRoutes([
@@ -42,6 +43,14 @@ function App() {
       element: (
         <Protected>
           <ProfilePage />
+        </Protected>
+      ),
+    },
+    {
+      path: "/guest-statistic",
+      element: (
+        <Protected>
+          <GuestStatisticPage />
         </Protected>
       ),
     },

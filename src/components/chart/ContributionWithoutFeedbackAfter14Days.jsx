@@ -5,26 +5,35 @@ import handleError from "../../services/HandleErrors";
 import NoData from "/gif/no_data.gif";
 import { Image } from "react-bootstrap";
 
-const AcceptanceRejectionRatePie = ({ facultyId }) => {
+const ContributionWithoutFeedbackAfter14Days = () => {
   const [series, setSeries] = useState([]);
   const [labels, setLabels] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        var params = null;
-        if (facultyId) {
-          params = { facultyId: facultyId };
-        }
+        const params = {
+          annualMagazineId: "2B3068E2-EAB5-476D-6C45-08DC458456C8",
+        };
 
-        const response = await statisticApi.acceptanceRejectionRate(params);
+        const response =
+          await statisticApi.getPercentageContributionFeedbackAfter14Days(
+            params
+          );
         console.log("🚀 ~ fetchData ~ response:", response);
 
-        Object.keys(response).forEach((key) => {
-          if (labels.includes(key)) return;
-          setSeries((series) => [...series, response[key]]);
-          setLabels((labels) => [...labels, key]);
-        });
+        const percentageWithFeedbackAfter14Days = response.percentage;
+        const percentageWithoutFeedbackAfter14Days =
+          100 - percentageWithFeedbackAfter14Days;
+
+        setSeries([
+          percentageWithoutFeedbackAfter14Days,
+          percentageWithFeedbackAfter14Days,
+        ]);
+        setLabels([
+          "Without feedback after 14 days (articles)",
+          "With feedback after 14 days (articles)",
+        ]);
       } catch (error) {
         handleError.showError(error);
       }
@@ -68,11 +77,11 @@ const AcceptanceRejectionRatePie = ({ facultyId }) => {
           options={state.options}
           series={state.series}
           type="pie"
-          width={355}
+          width={520}
         />
       )}
     </div>
   );
 };
 
-export default AcceptanceRejectionRatePie;
+export default ContributionWithoutFeedbackAfter14Days;

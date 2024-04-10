@@ -9,6 +9,8 @@ import statisticApi from "../api/statisticApi";
 import formatDateTime from "../services/FormatDateTime";
 import NoData from "/gif/no_data.gif";
 import { Image } from "react-bootstrap";
+import ContributionWithoutFeedback from "../components/chart/ContributionWithoutFeedback";
+import ContributionWithoutFeedbackAfter14Days from "../components/chart/ContributionWithoutFeedbackAfter14Days";
 
 const DashboardPage = () => {
   const row = [
@@ -50,12 +52,23 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          <div className="col-md-6">
+          {/* <div className="col-md-6">
             <div className="card info-card revenue-card">
               <div className="card-body">
                 <h5 className="card-title">Number of accounts created</h5>
 
                 <NumberOfAccountBarChart />
+              </div>
+            </div>
+          </div> */}
+          <div className="col-md-6">
+            <div className="card info-card sales-card">
+              <div className="card-body">
+                <h5 className="card-title">
+                  Percentage contributions after 14 days
+                </h5>
+
+                <ContributionWithoutFeedback />
               </div>
             </div>
           </div>
@@ -64,7 +77,7 @@ const DashboardPage = () => {
         <div className="card">
           <div className="card-body">
             <h5 className="card-title">
-              Number of contributions within each Faculty for each academic
+              Number of contributiors within each Faculty for each academic
               year.
             </h5>
             <NumberOfContributionsChart />
@@ -79,6 +92,32 @@ const DashboardPage = () => {
             <PercentagesChart />
           </div>
         </div>
+
+        {/* <div className="row">
+          <div className="col-md-6">
+            <div className="card info-card sales-card">
+              <div className="card-body">
+                <h5 className="card-title">
+                  Percentage contributions after 14 days
+                </h5>
+
+                <ContributionWithoutFeedback />
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-6">
+            <div className="card info-card revenue-card">
+              <div className="card-body">
+                <h5 className="card-title">
+                  Percentage contributions after 14 days
+                </h5>
+
+                <ContributionWithoutFeedbackAfter14Days />
+              </div>
+            </div>
+          </div>
+        </div> */}
 
         <div className="card recent-sales overflow-auto">
           <div className="card-body">

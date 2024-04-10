@@ -3,14 +3,20 @@ import ReactApexChart from "react-apexcharts";
 import statisticApi from "../../api/statisticApi";
 import handleError from "../../services/HandleErrors";
 
-const NumberOfContributionsChart = () => {
+const NumberOfContributionsChart = ({ facultyId }) => {
   const [series, setSeries] = useState([]);
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await statisticApi.numberOfContributions();
+        var params = null;
+        if (facultyId) {
+          params = { facultyId: facultyId };
+        }
+
+        const response = await statisticApi.numberOfContributions(params);
+
         setSeries(formatData(response));
         setCategories(formatCategories(response));
       } catch (error) {

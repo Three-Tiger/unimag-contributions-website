@@ -29,6 +29,10 @@ const Header = () => {
     return authService.getUserRole() === "Student";
   };
 
+  const isGuest = () => {
+    return authService.getUserRole() === "Guest";
+  };
+
   const handleLogout = () => {
     swalService.confirmToHandle(
       "Are you sure you want to logout?",
@@ -122,6 +126,16 @@ const Header = () => {
                               My Profile
                             </Link>
                           </li>
+                          {isGuest() && (
+                            <li>
+                              <Link
+                                className="dropdown-item"
+                                to="/guest-statistic"
+                              >
+                                Statistic
+                              </Link>
+                            </li>
+                          )}
                           {isStudent() && (
                             <li>
                               <Link
