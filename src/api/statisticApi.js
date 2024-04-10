@@ -1,9 +1,9 @@
 import axiosClient from "./axiosClient";
 
 class StatisticApi {
-    acceptanceRejectionRate() {
+    acceptanceRejectionRate(params) {
         const url = '/api/statistics/acceptance-rejection-rate';
-        return axiosClient.get(url);
+        return axiosClient.get(url, { params });
     }
 
     numberOfAccountsCreated() {

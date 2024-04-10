@@ -1,4 +1,4 @@
-import { Badge, Button, Card, Modal, Spinner, Table } from "react-bootstrap";
+import { Button, Card, Modal, Spinner, Table } from "react-bootstrap";
 import formatDateTime from "../services/FormatDateTime";
 import { useEffect, useState } from "react";
 import contributionApi from "../api/contributionApi";
@@ -9,15 +9,22 @@ import fileDetailApi from "../api/fileDetailApi";
 import imageDetailApi from "../api/imageDetailApi";
 import swalService from "../services/SwalService";
 import emailApi from "../api/emailApi";
-import feedbackApi from "../api/feedbackApi";
-import Pusher from "pusher-js";
 import CountdownTimer from "./CountdownTimer";
+import { Link } from "react-router-dom";
 
 const SubmissionComponent = ({ annualMagazine }) => {
+  const row = [
+    "#",
+    "Title",
+    "Submission Date",
+    "Status",
+    "Is Published",
+    "Action",
+  ];
   const isClosed = new Date(annualMagazine.closureDate) < new Date();
   const isFinalClosed = new Date(annualMagazine.finalClosureDate) < new Date();
   const [isLoading, setIsLoading] = useState(false);
-  const [contribution, setContribution] = useState({});
+  const [contributions, setContributions] = useState([]);
   const [modelTitle, setModelTitle] = useState("Add new Contribution");
   const [show, setShow] = useState(false);
   const [showChildModal, setShowChildModal] = useState(false);
@@ -51,40 +58,24 @@ const SubmissionComponent = ({ annualMagazine }) => {
   const handleCloseChildModal = () => setShowChildModal(false);
   const handleOpenChildModal = () => setShowChildModal(true);
 
-  const timeRemainingClosureDate = () => {
-    if (!isClosed) {
-      return formatDateTime.subtractDateTime(annualMagazine.closureDate);
-    }
-
-    return "The submission is closed";
-  };
-
-  const timeRemainingFinalClosureDate = () => {
-    if (!isFinalClosed) {
-      return formatDateTime.subtractDateTime(annualMagazine.finalClosureDate);
-    }
-
-    return "The submission is closed";
-  };
-
   const isDisplaySubmitButton = () => {
-    return !isClosed && Object.keys(contribution).length === 0;
+    return !isClosed;
   };
 
   const isDisplayRemoveButton = () => {
     return (
-      (!isClosed || !isFinalClosed) && Object.keys(contribution).length > 0
+      (!isClosed || !isFinalClosed) && Object.keys(contributions).length > 0
     );
   };
 
   const isDisplayUpdateButton = () => {
     return (
-      (!isClosed || !isFinalClosed) && Object.keys(contribution).length > 0
+      (!isClosed || !isFinalClosed) && Object.keys(contributions).length > 0
     );
   };
 
   const isGraded = () => {
-    return contribution.feedbacks?.length > 0;
+    return contributions.feedbacks?.length > 0;
   };
 
   // yup validation
@@ -136,7 +127,10 @@ const SubmissionComponent = ({ annualMagazine }) => {
     swalService.confirmDelete(async () => {
       try {
         await contributionApi.remove(id);
-        setContribution({});
+        const newContributions = contributions.filter(
+          (contribution) => contribution.contributionId !== id
+        );
+        setContributions(newContributions);
       } catch (error) {
         handleError.showError(error);
       }
@@ -146,29 +140,26 @@ const SubmissionComponent = ({ annualMagazine }) => {
   const showUpdate = () => {
     setModelTitle("Update Contribution");
     setFormContribution({
-      contributionId: contribution.contributionId,
-      title: contribution.title,
+      contributionId: contributions.contributionId,
+      title: contributions.title,
       termAndCondition: true,
     });
     setShow(true);
   };
 
-  const handleSendFeedback = async (event) => {
-    event.preventDefault();
-    const content = event.target[0].value;
-    if (!content) {
-      return;
+  const getFileExtension = (filename) => {
+    return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
+  };
+
+  const checkFileTypeByExtension = (filename) => {
+    const extension = getFileExtension(filename).toLowerCase();
+    const docExtensions = ["doc", "docx"];
+
+    if (docExtensions.includes(extension)) {
+      return true;
     }
-    const feedbackData = {
-      content: content,
-      feedbackDate: new Date(),
-      userId: userData.userId,
-      contributionId: contribution.contributionId,
-    };
 
-    await feedbackApi.save(feedbackData);
-
-    event.target[0].value = "";
+    return false;
   };
 
   // Form
@@ -182,17 +173,30 @@ const SubmissionComponent = ({ annualMagazine }) => {
       setIsLoading(true);
       if (formContribution.contributionId) {
         try {
+          for (let file of formContribution.fileDetails) {
+            if (!checkFileTypeByExtension(file.name)) {
+              return handleError.showError({
+                response: {
+                  status: 400,
+                  data: {
+                    message: "File type is not supported",
+                  },
+                },
+              });
+            }
+          }
+
           const contributionData = {
             contributionId: formContribution.contributionId,
             title: formContribution.title,
             submissionDate: new Date(),
-            status: contribution.status,
+            status: contributions.status,
             isPublished: false,
-            userId: authService.getUserData().userId,
+            userId: userData.userId,
             annualMagazineId: annualMagazine.annualMagazineId,
           };
 
-          // Update contribution
+          // Update contributions
           await contributionApi.update(contributionData);
 
           // Save file details
@@ -235,6 +239,8 @@ const SubmissionComponent = ({ annualMagazine }) => {
             // Save image details
             await imageDetailApi.save(formImageData);
           }
+
+          handleClose();
         } catch (error) {
           handleError.showError(error);
         } finally {
@@ -242,15 +248,28 @@ const SubmissionComponent = ({ annualMagazine }) => {
         }
       } else {
         try {
+          for (let file of formContribution.fileDetails) {
+            if (!checkFileTypeByExtension(file.name)) {
+              return handleError.showError({
+                response: {
+                  status: 400,
+                  data: {
+                    message: "File type is not supported",
+                  },
+                },
+              });
+            }
+          }
+
           const contributionData = {
             title: formContribution.title,
             submissionDate: new Date(),
             status: "Waiting",
-            userId: authService.getUserData().userId,
+            userId: userData.userId,
             annualMagazineId: annualMagazine.annualMagazineId,
           };
 
-          // Save contribution
+          // Save contributions
           const response = await contributionApi.save(contributionData);
           const contributionId = response.contributionId;
 
@@ -284,11 +303,8 @@ const SubmissionComponent = ({ annualMagazine }) => {
             to: "",
             subject: "Notification of Student Contribution Submission",
             content: {
-              facultyId: authService.getUserData().faculty.facultyId,
-              studentName:
-                authService.getUserData().firstName +
-                " " +
-                authService.getUserData().lastName,
+              facultyId: userData.faculty.facultyId,
+              studentName: userData.firstName + " " + userData.lastName,
               contributionTitle: contributionData.title,
               submissionDate: formatDateTime.toDateTimeString(
                 contributionData.submissionDate
@@ -296,24 +312,22 @@ const SubmissionComponent = ({ annualMagazine }) => {
             },
           };
           await emailApi.sendMailAsync(email);
+
+          handleClose();
         } catch (error) {
-          console.log("🚀 ~ handleSubmit ~ error:", error);
           handleError.showError(error);
         } finally {
           setIsLoading(false);
         }
       }
 
-      const user = authService.getUserData();
       const fetchContribution =
         await contributionApi.getContributionsByAnnualMagazineIdAndUserId(
           annualMagazine.annualMagazineId,
-          user.userId
+          userData.userId
         );
-      setContribution(fetchContribution);
-      handleClose();
+      setContributions(fetchContribution);
     } catch (error) {
-      console.log("🚀 ~ handleSubmit ~ error:", error);
       const newError = {};
       error.inner.forEach((e) => {
         newError[e.path] = e.message;
@@ -332,32 +346,14 @@ const SubmissionComponent = ({ annualMagazine }) => {
             annualMagazine.annualMagazineId,
             user.userId
           );
-        setContribution(response || {});
+        console.log(response);
+        setContributions(response || {});
       } catch (error) {
         handleError.showError(error);
       }
     };
 
-    const initializePusher = () => {
-      // Enable pusher logging - don't include this in production
-      Pusher.logToConsole = true;
-
-      const pusher = new Pusher("225d52aa0ca3ec6aaebe", {
-        cluster: "ap1",
-      });
-
-      const channel = pusher.subscribe("unimag-chat");
-      channel.bind("message", async function (data) {
-        await fetchData();
-      });
-    };
-
-    const fetchDataAndInitializePusher = async () => {
-      await fetchData();
-      initializePusher();
-    };
-
-    fetchDataAndInitializePusher();
+    fetchData();
   }, []);
 
   return (
@@ -377,28 +373,6 @@ const SubmissionComponent = ({ annualMagazine }) => {
           <Table striped>
             <tbody>
               <tr>
-                <td className="fw-bold col-3">Submission Status</td>
-                <td>
-                  {Object.keys(contribution).length > 0 ? (
-                    <p className="text-success fw-bold mb-0">
-                      Submitted for grading
-                    </p>
-                  ) : (
-                    <p className="text-danger fw-bold mb-0">No attempt</p>
-                  )}
-                </td>
-              </tr>
-              <tr>
-                <td className="fw-bold col-3">Grading status</td>
-                <td>
-                  {isGraded() ? (
-                    <p className="text-success fw-bold mb-0">Graded</p>
-                  ) : (
-                    <p className="text-danger fw-bold mb-0">Not graded</p>
-                  )}
-                </td>
-              </tr>
-              <tr>
                 <td className="fw-bold col-3">Closure Date</td>
                 <td>
                   {formatDateTime.toDateTimeString(annualMagazine.closureDate)}
@@ -416,14 +390,10 @@ const SubmissionComponent = ({ annualMagazine }) => {
                 <td className="fw-bold col-3">Time remaining</td>
                 <td>
                   <div>
-                    {/* <span className="fw-bold">Closure Date</span>:{" "}
-                    {timeRemainingClosureDate()} */}
                     <span className="fw-bold">Closure Date</span>:{" "}
                     <CountdownTimer targetDate={annualMagazine.closureDate} />
                   </div>
                   <div>
-                    {/* <span className="fw-bold">Final Closure Date</span>:{" "}
-                    {timeRemainingFinalClosureDate()} */}
                     <span className="fw-bold">Final Closure Date</span>:{" "}
                     <CountdownTimer
                       targetDate={annualMagazine.finalClosureDate}
@@ -431,81 +401,12 @@ const SubmissionComponent = ({ annualMagazine }) => {
                   </div>
                 </td>
               </tr>
-              {Object.keys(contribution).length > 0 && (
-                <>
-                  <tr>
-                    <td className="fw-bold col-3">Title</td>
-                    <td>{contribution.title}</td>
-                  </tr>
-                  <tr>
-                    <td className="fw-bold col-3">File submissions</td>
-                    <td>
-                      {contribution.fileDetails.map((file, index) => (
-                        <div
-                          className="d-flex align-items-center gap-2 mb-3"
-                          key={index}
-                        >
-                          <h2 className="mb-0">
-                            {file.fileType == "DOCX" ? (
-                              <i className="bi bi-filetype-docx"></i>
-                            ) : (
-                              <i className="bi bi-filetype-pdf"></i>
-                            )}
-                          </h2>
-                          <div>
-                            <a
-                              href={`/api/file-details/${file.fileId}/download`}
-                              key={index}
-                            >
-                              {file.fileName}
-                            </a>
-                            <div>
-                              {formatDateTime.toDateTimeString(
-                                contribution.submissionDate
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="fw-bold col-3">Image submissions</td>
-                    <td>
-                      <div className="d-flex flex-wrap align-items-center gap-2">
-                        {contribution.imageDetails.map((image, index) => (
-                          <img
-                            src={`/api/image-details/${image.imageId}`}
-                            alt={image.imageName}
-                            key={index}
-                            className="img-thumbnail w-25 h-25"
-                          />
-                        ))}
-                      </div>
-                    </td>
-                  </tr>
-                </>
-              )}
             </tbody>
           </Table>
           <div className="mt-3 text-center">
             {isDisplaySubmitButton() && (
               <Button variant="warning" className="me-2" onClick={handleShow}>
                 Submit
-              </Button>
-            )}
-            {isDisplayRemoveButton() && (
-              <Button
-                variant="danger"
-                className="me-2"
-                onClick={handeRemove(contribution.contributionId)}
-              >
-                Remove
-              </Button>
-            )}
-            {isDisplayUpdateButton() && (
-              <Button variant="outline-warning" onClick={showUpdate}>
-                Update
               </Button>
             )}
           </div>
@@ -671,95 +572,78 @@ const SubmissionComponent = ({ annualMagazine }) => {
               </Modal.Footer>
             </form>
           </Modal>
-          <div className="my-5 py-5"></div>
-          {Object.keys(contribution).length > 0 &&
-            contribution.feedbacks.length > 0 && (
-              <Table striped>
+          <div className="my-5"></div>
+          {contributions.length > 0 && (
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  {row.map((item, index) => (
+                    <th key={index}>{item}</th>
+                  ))}
+                </tr>
+              </thead>
+              {contributions.map((contribution, index) => (
                 <tbody>
-                  <tr>
-                    <td className="fw-bold col-3">Status</td>
-                    <td>
-                      {contribution.status == "Approved" ? (
-                        <Badge bg="success">{contribution.status}</Badge>
-                      ) : (
-                        <Badge bg="danger">{contribution.status}</Badge>
-                      )}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="fw-bold col-3">Feedback on</td>
+                  <tr key={index} className="align-middle">
+                    <td>{index + 1}</td>
+                    <td>{contribution.title}</td>
                     <td>
                       {formatDateTime.toDateTimeString(
-                        contribution.feedbacks[0].feedbackDate
+                        contribution.submissionDate
                       )}
                     </td>
-                  </tr>
-                  <tr>
-                    <td className="fw-bold col-3">Feedback by</td>
                     <td>
-                      <div className="d-flex gap-2">
-                        <p className="mb-0">
-                          {contribution.feedbacks[0].user.firstName}{" "}
-                          {contribution.feedbacks[0].user.lastName}
-                        </p>
-                      </div>
+                      <span
+                        className={
+                          contribution.status === "Waiting"
+                            ? "badge bg-warning"
+                            : contribution.status === "Approved"
+                            ? "badge bg-success"
+                            : "badge bg-danger"
+                        }
+                      >
+                        {contribution.status}
+                      </span>
                     </td>
-                  </tr>
-                  <tr>
-                    <td className="fw-bold col-3">Feedback comment</td>
                     <td>
-                      <div className="container">
-                        {contribution.feedbacks.map((feedback, index) => (
-                          <div className="chat-box" key={index}>
-                            <div
-                              className={
-                                feedback.user.userId == userData.userId
-                                  ? "user-message"
-                                  : "other-message"
-                              }
-                            >
-                              {feedback.user?.userId == userData.userId && (
-                                <div className="message">
-                                  <pre>{feedback.content}</pre>
-                                </div>
-                              )}
-                              <img
-                                src={
-                                  feedback.user?.profilePicture
-                                    ? `/api/users/${feedback.user?.userId}/image`
-                                    : "/image/default-avatar.png"
-                                }
-                                alt="Avatar"
-                                className="avatar"
-                              />
-                              {feedback.user?.userId != userData.userId && (
-                                <div className="message">
-                                  <pre>{feedback.content}</pre>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                        <form onSubmit={handleSendFeedback}>
-                          <div className="input-group message-input">
-                            <textarea
-                              className="form-control"
-                              placeholder="Type your message..."
-                              rows={3}
-                            />
-                            <div className="ms-2">
-                              <button className="btn btn-warning" type="submit">
-                                Send
-                              </button>
-                            </div>
-                          </div>
-                        </form>
+                      <span
+                        className={
+                          contribution.isPublished
+                            ? "badge bg-success"
+                            : "badge bg-danger"
+                        }
+                      >
+                        {contribution.isPublished ? "Published" : "Unreleased"}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="d-flex flex-wrap gap-1">
+                        <Link to={`/submission/${contribution.contributionId}`}>
+                          <Button
+                            variant="outline-warning"
+                            // onClick={handleGiveFeedback(
+                            //   contribution.contributionId
+                            // )}
+                          >
+                            View
+                          </Button>
+                        </Link>
+                        {isDisplayRemoveButton() && (
+                          <Button
+                            variant="danger"
+                            className="me-2"
+                            onClick={handeRemove(contribution.contributionId)}
+                          >
+                            Remove
+                          </Button>
+                        )}
                       </div>
                     </td>
                   </tr>
                 </tbody>
-              </Table>
-            )}
+              ))}
+            </table>
+          )}
         </Card.Body>
       </Card>
     </>

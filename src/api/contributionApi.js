@@ -1,9 +1,9 @@
 import axiosClient from "./axiosClient";
 
 class ContributionApi {
-    getContributionsByAnnualMagazineIdAndFacultyId(annualMagazineId, facultyId) {
-        const url = `/api/contributions/annual-magazine/${annualMagazineId}/faculty/${facultyId}`;
-        return axiosClient.get(url);
+    getContributionsByAnnualMagazineIdAndFacultyId(params) {
+        const url = `/api/contributions/manage`;
+        return axiosClient.get(url, { params });
     }
 
     getContributionsByFilter(filter) {

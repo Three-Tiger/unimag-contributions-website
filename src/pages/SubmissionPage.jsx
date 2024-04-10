@@ -12,6 +12,7 @@ import {
 import FullLayout from "../components/layouts/Full";
 import annualMagazineApi from "../api/annualMagazine";
 import SubmissionComponent from "../components/SubmissionComponent";
+import ContributionComponent from "../components/ContributionComponent";
 
 const SubmissionPage = () => {
   const [annualMagazines, setAnnualMagazines] = useState([]);
@@ -79,6 +80,13 @@ const SubmissionPage = () => {
                             <SubmissionComponent
                               annualMagazine={annualMagazine}
                             />
+                            // <Card>
+                            //   <Card.Body>
+                            //     <ContributionComponent
+                            //       annualMagazine={annualMagazine}
+                            //     />
+                            //   </Card.Body>
+                            // </Card>
                           )}
                         </Tab.Pane>
                       ))}

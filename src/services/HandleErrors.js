@@ -2,7 +2,7 @@ import swalService from "./SwalService";
 
 class HandleError {
     showError(error) {
-        switch (error.response.status) {
+        switch (error.response?.status) {
             case 400:
                 swalService.showMessage(
                     "Warning",
