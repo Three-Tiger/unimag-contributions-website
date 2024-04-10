@@ -17,6 +17,7 @@ import StudentProtected from "./components/layouts/StudentProtected.jsx";
 import ArticleDetailPage from "./pages/ArticleDetailPage.jsx";
 import MyContributionPage from "./pages/MyContribution.jsx";
 import Protected from "./components/layouts/Protected.jsx";
+import SubmissionDetailPage from "./pages/SubmissionDetailPage.jsx";
 
 function App() {
   const router = useRoutes([
@@ -46,11 +47,24 @@ function App() {
     },
     {
       path: "/submission",
-      element: (
-        <StudentProtected>
-          <SubmissionPage />
-        </StudentProtected>
-      ),
+      children: [
+        {
+          path: "",
+          element: (
+            <StudentProtected>
+              <SubmissionPage />
+            </StudentProtected>
+          ),
+        },
+        {
+          path: ":id",
+          element: (
+            <StudentProtected>
+              <SubmissionDetailPage />
+            </StudentProtected>
+          ),
+        },
+      ],
     },
     {
       path: "/article",

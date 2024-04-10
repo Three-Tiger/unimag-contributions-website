@@ -11,8 +11,6 @@ import Pusher from "pusher-js";
 import CountdownTimer from "./CountdownTimer";
 
 const ContributionComponent = ({ annualMagazine }) => {
-  const isClosed = new Date(annualMagazine.closureDate) < new Date();
-  const isFinalClosed = new Date(annualMagazine.finalClosureDate) < new Date();
   const row = [
     "#",
     "Title",
@@ -69,9 +67,10 @@ const ContributionComponent = ({ annualMagazine }) => {
   };
 
   const feedbackRemainingDate = () => {
-    const finalClosureDate = new Date(annualMagazine.finalClosureDate);
+    console.log(contribution);
+    const submissionDate = new Date(contribution.submissionDate);
     const after14Days = new Date(
-      finalClosureDate.setDate(finalClosureDate.getDate() + 14)
+      submissionDate.setDate(submissionDate.getDate() + 14)
     );
     return after14Days;
   };
@@ -86,6 +85,10 @@ const ContributionComponent = ({ annualMagazine }) => {
 
   const isManager = () => {
     return authService.getUserData().role.name === "Manager";
+  };
+
+  const isStudent = () => {
+    return authService.getUserData().role.name === "Student";
   };
 
   const downloadFile = async (fileId, fileName) => {
@@ -154,7 +157,6 @@ const ContributionComponent = ({ annualMagazine }) => {
     event.preventDefault();
     if (formFilterData.status || formFilterData.isPublished) {
       const response = await contributionApi.getContributionsByFilter({
-        facultyId: userData.faculty.facultyId,
         annualMagazineId: annualMagazine.annualMagazineId,
         status: formFilterData.status,
         isPublished: formFilterData.isPublished,
@@ -162,10 +164,9 @@ const ContributionComponent = ({ annualMagazine }) => {
       setContributions(response);
     } else {
       const response =
-        await contributionApi.getContributionsByAnnualMagazineIdAndFacultyId(
-          annualMagazine.annualMagazineId,
-          userData.faculty.facultyId
-        );
+        await contributionApi.getContributionsByAnnualMagazineIdAndFacultyId({
+          annualMagazineId: annualMagazine.annualMagazineId,
+        });
       setContributions(response);
     }
   };
@@ -283,10 +284,27 @@ const ContributionComponent = ({ annualMagazine }) => {
       try {
         const user = authService.getUserData();
         setUserData(user);
+
+        var params = {};
+        if (user.role.name === "Coordinator") {
+          params = {
+            facultyId: user.faculty.facultyId,
+            annualMagazineId: annualMagazine.annualMagazineId,
+          };
+        } else if (user.role.name === "Student") {
+          params = {
+            annualMagazineId: annualMagazine.annualMagazineId,
+            userId: user.userId,
+          };
+        } else {
+          params = {
+            annualMagazineId: annualMagazine.annualMagazineId,
+          };
+        }
+
         const response =
           await contributionApi.getContributionsByAnnualMagazineIdAndFacultyId(
-            annualMagazine.annualMagazineId,
-            user.faculty.facultyId
+            params
           );
         setContributions(response);
       } catch (error) {
@@ -319,6 +337,12 @@ const ContributionComponent = ({ annualMagazine }) => {
 
   return (
     <>
+      {isStudent() && (
+        <div className="mb-2">
+          <Button variant="warning">Add new</Button>
+        </div>
+      )}
+
       <Modal
         size="lg"
         show={show}
@@ -455,58 +479,63 @@ const ContributionComponent = ({ annualMagazine }) => {
               )}
             </tbody>
           </table>
-          <div className="my-5 py-5"></div>
+          <div className="my-5 py-2"></div>
           {isManager() ? (
             <div>
               {contribution.feedbacks?.length > 0 ? (
                 <form onSubmit={handleSubmitPublish}>
                   <Table striped>
                     <tbody>
-                      <tr>
-                        <td className="fw-bold col-3">Is Published</td>
-                        <td>
-                          <div className="mb-3">
-                            <label htmlFor="facultyName" className="form-label">
-                              Your decision (choose one option)
-                            </label>
-                            <div>
-                              <input
-                                type="radio"
-                                className="btn-check"
-                                name="isPublished"
-                                id="success-outlined"
-                                value="true"
-                                autoComplete="off"
-                                checked={formPublishData.isPublished}
-                                onChange={handleChangePublished}
-                              />
+                      {contribution.status == "Approved" && (
+                        <tr>
+                          <td className="fw-bold col-3">Is Published</td>
+                          <td>
+                            <div className="mb-3">
                               <label
-                                className="btn btn-outline-success me-2"
-                                htmlFor="success-outlined"
+                                htmlFor="facultyName"
+                                className="form-label"
                               >
-                                Published
+                                Your decision (choose one option)
                               </label>
+                              <div>
+                                <input
+                                  type="radio"
+                                  className="btn-check"
+                                  name="isPublished"
+                                  id="success-outlined"
+                                  value="true"
+                                  autoComplete="off"
+                                  checked={formPublishData.isPublished}
+                                  onChange={handleChangePublished}
+                                />
+                                <label
+                                  className="btn btn-outline-success me-2"
+                                  htmlFor="success-outlined"
+                                >
+                                  Published
+                                </label>
 
-                              <input
-                                type="radio"
-                                className="btn-check"
-                                name="isPublished"
-                                id="danger-outlined"
-                                value="false"
-                                autoComplete="off"
-                                checked={!formPublishData.isPublished}
-                                onChange={handleChangePublished}
-                              />
-                              <label
-                                className="btn btn-outline-danger me-2"
-                                htmlFor="danger-outlined"
-                              >
-                                Unreleased
-                              </label>
+                                <input
+                                  type="radio"
+                                  className="btn-check"
+                                  name="isPublished"
+                                  id="danger-outlined"
+                                  value="false"
+                                  autoComplete="off"
+                                  checked={!formPublishData.isPublished}
+                                  onChange={handleChangePublished}
+                                />
+                                <label
+                                  className="btn btn-outline-danger me-2"
+                                  htmlFor="danger-outlined"
+                                >
+                                  Unreleased
+                                </label>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                      </tr>
+                          </td>
+                        </tr>
+                      )}
                       <tr>
                         <td className="fw-bold col-3">Status</td>
                         <td>
@@ -548,11 +577,13 @@ const ContributionComponent = ({ annualMagazine }) => {
                       </tr>
                     </tbody>
                   </Table>
-                  <div className="text-center">
-                    <Button variant="outline-warning" type="submit">
-                      Confirm
-                    </Button>
-                  </div>
+                  {contribution.status == "Approved" && (
+                    <div className="text-center">
+                      <Button variant="outline-warning" type="submit">
+                        Confirm
+                      </Button>
+                    </div>
+                  )}
                 </form>
               ) : (
                 <div className="text-center">
@@ -719,11 +750,19 @@ const ContributionComponent = ({ annualMagazine }) => {
       {contributions.length > 0 && (
         <Table striped bordered hover responsive>
           <thead>
-            <tr>
-              {row.map((item, index) => (
-                <th key={index}>{item}</th>
-              ))}
-            </tr>
+            {isStudent() ? (
+              <tr>
+                {rowUser.map((item, index) => (
+                  <th key={index}>{item}</th>
+                ))}
+              </tr>
+            ) : (
+              <tr>
+                {row.map((item, index) => (
+                  <th key={index}>{item}</th>
+                ))}
+              </tr>
+            )}
           </thead>
           <tbody>
             {contributions.map((contribution, index) => (
@@ -733,6 +772,7 @@ const ContributionComponent = ({ annualMagazine }) => {
                 <td>
                   {formatDateTime.toDateTimeString(contribution.submissionDate)}
                 </td>
+
                 <td>
                   <span
                     className={
@@ -746,24 +786,28 @@ const ContributionComponent = ({ annualMagazine }) => {
                     {contribution.status}
                   </span>
                 </td>
-                <td>{contribution.user.email}</td>
-                <td>
-                  {contribution.user.firstName} {contribution.user.lastName}
-                </td>
-                <td>
-                  <img
-                    src={
-                      contribution.user.profilePicture
-                        ? `/api/users/${contribution.user.userId}/image`
-                        : "/image/default-avatar.png"
-                    }
-                    alt={contribution.user.firstName}
-                    width="50"
-                    height="50"
-                    className="rounded-circle"
-                  />
-                </td>
-                <td>{contribution.user.faculty.name}</td>
+                {!isStudent() && (
+                  <>
+                    <td>{contribution.user.email}</td>
+                    <td>
+                      {contribution.user.firstName} {contribution.user.lastName}
+                    </td>
+                    <td>
+                      <img
+                        src={
+                          contribution.user.profilePicture
+                            ? `/api/users/${contribution.user.userId}/image`
+                            : "/image/default-avatar.png"
+                        }
+                        alt={contribution.user.firstName}
+                        width="50"
+                        height="50"
+                        className="rounded-circle"
+                      />
+                    </td>
+                    <td>{contribution.user.faculty.name}</td>
+                  </>
+                )}
                 <td>
                   <span
                     className={
