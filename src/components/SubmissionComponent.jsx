@@ -68,12 +68,6 @@ const SubmissionComponent = ({ annualMagazine }) => {
     );
   };
 
-  const isDisplayUpdateButton = () => {
-    return (
-      (!isClosed || !isFinalClosed) && Object.keys(contributions).length > 0
-    );
-  };
-
   const isGraded = () => {
     return contributions.feedbacks?.length > 0;
   };
@@ -137,16 +131,6 @@ const SubmissionComponent = ({ annualMagazine }) => {
     });
   };
 
-  const showUpdate = () => {
-    setModelTitle("Update Contribution");
-    setFormContribution({
-      contributionId: contributions.contributionId,
-      title: contributions.title,
-      termAndCondition: true,
-    });
-    setShow(true);
-  };
-
   const getFileExtension = (filename) => {
     return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
   };
@@ -154,6 +138,17 @@ const SubmissionComponent = ({ annualMagazine }) => {
   const checkFileTypeByExtension = (filename) => {
     const extension = getFileExtension(filename).toLowerCase();
     const docExtensions = ["doc", "docx"];
+
+    if (docExtensions.includes(extension)) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const checkImageTypeByExtension = (filename) => {
+    const extension = getFileExtension(filename).toLowerCase();
+    const docExtensions = ["jpg", "jpeg", "png"];
 
     if (docExtensions.includes(extension)) {
       return true;
@@ -171,154 +166,90 @@ const SubmissionComponent = ({ annualMagazine }) => {
       });
 
       setIsLoading(true);
-      if (formContribution.contributionId) {
-        try {
-          for (let file of formContribution.fileDetails) {
-            if (!checkFileTypeByExtension(file.name)) {
-              return handleError.showError({
-                response: {
-                  status: 400,
-                  data: {
-                    message: "File type is not supported",
-                  },
+      try {
+        for (let file of formContribution.fileDetails) {
+          if (!checkFileTypeByExtension(file.name)) {
+            return handleError.showError({
+              response: {
+                status: 400,
+                data: {
+                  message: "Only .docx file is supported",
                 },
-              });
-            }
-          }
-
-          const contributionData = {
-            contributionId: formContribution.contributionId,
-            title: formContribution.title,
-            submissionDate: new Date(),
-            status: contributions.status,
-            isPublished: false,
-            userId: userData.userId,
-            annualMagazineId: annualMagazine.annualMagazineId,
-          };
-
-          // Update contributions
-          await contributionApi.update(contributionData);
-
-          // Save file details
-          if (formContribution.fileDetails) {
-            // Delete old file details
-            await fileDetailApi.removeFileByContributionId(
-              formContribution.contributionId
-            );
-
-            const formFileData = new FormData();
-
-            formContribution.fileDetails.forEach((file, index) => {
-              formFileData.append(
-                `fileDetails[${index}].contributionId`,
-                formContribution.contributionId
-              );
-              formFileData.append(`fileDetails[${index}].fileUpload`, file);
+              },
             });
-
-            // Save file details
-            await fileDetailApi.save(formFileData);
           }
-
-          // Save image details
-          if (formContribution.imageDetails) {
-            // Delete old image details
-            await imageDetailApi.removeImageByContributionId(
-              formContribution.contributionId
-            );
-
-            const formImageData = new FormData();
-            formContribution.imageDetails.forEach((image, index) => {
-              formImageData.append(
-                `imageDetails[${index}].contributionId`,
-                formContribution.contributionId
-              );
-              formImageData.append(`imageDetails[${index}].fileUpload`, image);
-            });
-
-            // Save image details
-            await imageDetailApi.save(formImageData);
-          }
-
-          handleClose();
-        } catch (error) {
-          handleError.showError(error);
-        } finally {
-          setIsLoading(false);
         }
-      } else {
-        try {
-          for (let file of formContribution.fileDetails) {
-            if (!checkFileTypeByExtension(file.name)) {
-              return handleError.showError({
-                response: {
-                  status: 400,
-                  data: {
-                    message: "File type is not supported",
-                  },
+
+        for (let file of formContribution.imageDetails) {
+          if (!checkImageTypeByExtension(file.name)) {
+            return handleError.showError({
+              response: {
+                status: 400,
+                data: {
+                  message: "Only .jpg, .jpeg, .png file is supported",
                 },
-              });
-            }
+              },
+            });
           }
-
-          const contributionData = {
-            title: formContribution.title,
-            submissionDate: new Date(),
-            status: "Waiting",
-            userId: userData.userId,
-            annualMagazineId: annualMagazine.annualMagazineId,
-          };
-
-          // Save contributions
-          const response = await contributionApi.save(contributionData);
-          const contributionId = response.contributionId;
-
-          const formFileData = new FormData();
-
-          formContribution.fileDetails.forEach((file, index) => {
-            formFileData.append(
-              `fileDetails[${index}].contributionId`,
-              contributionId
-            );
-            formFileData.append(`fileDetails[${index}].fileUpload`, file);
-          });
-
-          // Save file details
-          await fileDetailApi.save(formFileData);
-
-          const formImageData = new FormData();
-          formContribution.imageDetails.forEach((image, index) => {
-            formImageData.append(
-              `imageDetails[${index}].contributionId`,
-              contributionId
-            );
-            formImageData.append(`imageDetails[${index}].fileUpload`, image);
-          });
-
-          // Save image details
-          await imageDetailApi.save(formImageData);
-
-          // Send email to coordinator
-          const email = {
-            to: "",
-            subject: "Notification of Student Contribution Submission",
-            content: {
-              facultyId: userData.faculty.facultyId,
-              studentName: userData.firstName + " " + userData.lastName,
-              contributionTitle: contributionData.title,
-              submissionDate: formatDateTime.toDateTimeString(
-                contributionData.submissionDate
-              ),
-            },
-          };
-          await emailApi.sendMailAsync(email);
-
-          handleClose();
-        } catch (error) {
-          handleError.showError(error);
-        } finally {
-          setIsLoading(false);
         }
+
+        const contributionData = {
+          title: formContribution.title,
+          submissionDate: new Date(),
+          status: "Waiting",
+          userId: userData.userId,
+          annualMagazineId: annualMagazine.annualMagazineId,
+        };
+
+        // Save contributions
+        const response = await contributionApi.save(contributionData);
+        const contributionId = response.contributionId;
+
+        const formFileData = new FormData();
+
+        formContribution.fileDetails.forEach((file, index) => {
+          formFileData.append(
+            `fileDetails[${index}].contributionId`,
+            contributionId
+          );
+          formFileData.append(`fileDetails[${index}].fileUpload`, file);
+        });
+
+        // Save file details
+        await fileDetailApi.save(formFileData);
+
+        const formImageData = new FormData();
+        formContribution.imageDetails.forEach((image, index) => {
+          formImageData.append(
+            `imageDetails[${index}].contributionId`,
+            contributionId
+          );
+          formImageData.append(`imageDetails[${index}].fileUpload`, image);
+        });
+
+        // Save image details
+        await imageDetailApi.save(formImageData);
+
+        // Send email to coordinator
+        const email = {
+          to: "",
+          subject: "Notification of Student Contribution Submission",
+          content: {
+            facultyId: userData.faculty.facultyId,
+            studentName: userData.firstName + " " + userData.lastName,
+            contributionTitle: contributionData.title,
+            submissionDate: formatDateTime.toDateTimeString(
+              contributionData.submissionDate
+            ),
+          },
+        };
+        await emailApi.sendMailAsync(email);
+
+        handleClose();
+      } catch (error) {
+        handleError.showError(error);
+      } finally {
+        setIsLoading(false);
       }
 
       const fetchContribution =

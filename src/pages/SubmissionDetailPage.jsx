@@ -10,7 +10,7 @@ import {
   Modal,
   Table,
 } from "react-bootstrap";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import contributionApi from "../api/contributionApi";
 import formatDateTime from "../services/FormatDateTime";
 import * as yup from "yup";
@@ -23,6 +23,7 @@ import Pusher from "pusher-js";
 import feedbackApi from "../api/feedbackApi";
 
 const SubmissionDetailPage = () => {
+  let navigate = useNavigate();
   let { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [contribution, setContribution] = useState({});
@@ -59,7 +60,7 @@ const SubmissionDetailPage = () => {
     setFormContribution({
       contributionId: contribution.contributionId,
       title: contribution.title,
-      termAndCondition: true,
+      termAndCondition: false,
     });
     setShow(true);
   };
@@ -165,6 +166,17 @@ const SubmissionDetailPage = () => {
     return false;
   };
 
+  const checkImageTypeByExtension = (filename) => {
+    const extension = getFileExtension(filename).toLowerCase();
+    const docExtensions = ["jpg", "jpeg", "png"];
+
+    if (docExtensions.includes(extension)) {
+      return true;
+    }
+
+    return false;
+  };
+
   const handleSendFeedback = async (event) => {
     event.preventDefault();
     const content = event.target[0].value;
@@ -203,7 +215,25 @@ const SubmissionDetailPage = () => {
                 response: {
                   status: 400,
                   data: {
-                    message: "File type is not supported",
+                    message: "Only .docx file is supported",
+                  },
+                },
+              });
+            }
+          }
+        }
+
+        if (
+          formContribution.imageDetails &&
+          formContribution.imageDetails.length > 0
+        ) {
+          for (let image of formContribution.imageDetails) {
+            if (!checkImageTypeByExtension(image.name)) {
+              return handleError.showError({
+                response: {
+                  status: 400,
+                  data: {
+                    message: "Only .jpg, .jpeg, .png file is supported",
                   },
                 },
               });
@@ -330,6 +360,13 @@ const SubmissionDetailPage = () => {
   return (
     <FullLayout>
       <Container>
+        <Button
+          className="mb-3"
+          variant="outline-warning"
+          onClick={() => navigate(-1)}
+        >
+          <i class="bi bi-arrow-left"></i>
+        </Button>
         <Modal
           show={show}
           onHide={handleClose}
