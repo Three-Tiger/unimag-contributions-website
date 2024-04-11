@@ -125,8 +125,10 @@ const ProfileComponent = () => {
         formDataSubmit.append("roleId", user.role.roleId);
 
         const userId = authService.getUserData().userId;
-        const response = await userApi.updateProfile(userId, formDataSubmit);
-        storageService.save("USER_DATA", response);
+        await userApi.updateProfile(userId, formDataSubmit);
+        const userData = await userApi.getById(userId);
+        setUser(userData);
+        storageService.save("USER_DATA", userData);
         swalService.showMessage(
           "Success",
           "Profile updated successfully",

@@ -38,7 +38,7 @@ const UserPage = () => {
     dateOfBirth: "",
     phoneNumber: "",
     address: "",
-    profilePicture: "",
+    profilePicture: null,
     newProfilePicture: null,
     facultyId: "",
     roleId: "",
@@ -60,7 +60,7 @@ const UserPage = () => {
       dateOfBirth: "",
       phoneNumber: "",
       address: "",
-      profilePicture: "",
+      profilePicture: null,
       newProfilePicture: null,
       facultyId: "",
       roleId: "",
@@ -184,6 +184,9 @@ const UserPage = () => {
       }
       await modifiedSchema.validate(formData, { abortEarly: false });
 
+      console.log(formData);
+      // return;
+
       setIsLoading(true);
       if (formData.userId) {
         try {
@@ -205,6 +208,7 @@ const UserPage = () => {
           );
 
           const response = await userApi.update(formDataSubmit);
+          console.log("🚀 ~ handleSubmit ~ response:", response);
           setUsers((previousState) => {
             return previousState.map((user) => {
               if (user.userId === formData.userId) {
@@ -240,6 +244,7 @@ const UserPage = () => {
           setUsers((previousState) => {
             return [response, ...previousState];
           });
+
           handleClose();
         } catch (error) {
           handleError.showError(error);
@@ -248,7 +253,6 @@ const UserPage = () => {
         }
       }
     } catch (error) {
-      console.log("🚀 ~ handleSubmit ~ error:", error.inner);
       const newError = {};
       error.inner.forEach((e) => {
         newError[e.path] = e.message;

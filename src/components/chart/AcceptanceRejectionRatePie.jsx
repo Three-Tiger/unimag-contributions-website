@@ -59,7 +59,8 @@ const AcceptanceRejectionRatePie = ({ facultyId }) => {
 
   return (
     <div>
-      {series[0] === 0 && series[1] === 0 && series[2] === 0 ? (
+      {(series[0] === 0 && series[1] === 0 && series[2] === 0) ||
+      (series[0] === 0 && series[1] === 0) ? (
         <div className="text-center">
           <Image src={NoData} alt="No data" height={215} />
         </div>
